@@ -37,7 +37,10 @@ const FormInput: React.FC<Props> = ({
           value={value}
           onChange={onChange}
         />
-        <i onClick={onIconClick} className="absolute  right-3 bottom-3">
+        <i
+          onClick={onIconClick}
+          className="absolute  right-3 bottom-3 cursor-pointer"
+        >
           {icon && <LucideIcon name={icon} size={20} />}
         </i>
       </label>

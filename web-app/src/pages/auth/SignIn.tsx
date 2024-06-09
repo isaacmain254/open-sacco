@@ -1,17 +1,44 @@
 import { FC, useState } from "react";
-import { Link, redirect } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // components
 import FormInput from "@/components/FormInput";
 import Button from "@/components/Button";
+import axios from "axios";
 
 const SignIn: FC = () => {
   // TODO: manage input type and icon state independently and validate form input
   const [inputType, setInputType] = useState("password");
   const [inputIcon, setInputIcon] = useState("EyeOff");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  // toggle password visibility
   const handleIconClick = () => {
     setInputType((prev) => (prev === "password" ? "text" : "password"));
     setInputIcon((prev) => (prev === "EyeOff" ? "Eye" : "EyeOff"));
   };
+
+  const navigate = useNavigate();
+
+  // handle login
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:8000/api/token/", {
+        username,
+        password,
+      });
+      // Store the token in local storage
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
+
+      // redirect to the dashboard
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="w-full h-screen  flex ">
       <div className="w-3/5 rounded-e-full  text-center flex flex-col justify-center bg-slate-200">
@@ -19,38 +46,38 @@ const SignIn: FC = () => {
         <p>A few more click to get started</p>
       </div>
       <div className="w-2/5">
-        <div className="w-full h-full flex  flex-col  items-center justify-center">
+        <div className="w-full h-full flex  flex-col  items-center justify-center border border-red-500">
           <div className="mb-7">
             <p>Logo</p>
             <h3>Sign In</h3>
           </div>
           <form className="w-72 space-y-4">
             <FormInput
-              type="email"
-              name="email"
-              placeholder="Email"
-              label="Email"
+              type="text"
+              name="text"
+              value={username}
+              placeholder="Username"
+              label="Username"
+              onChange={(e) => setUsername(e.target.value)}
             />
             <FormInput
               type={inputType}
               name="password"
+              value={password}
               placeholder="Password"
-              className=""
               label="Password"
               icon={inputIcon}
+              onChange={(e) => setPassword(e.target.value)}
               onIconClick={handleIconClick}
             />
-            <div className="flex justify-between items-center ">
-              <FormInput type="checkbox" name="remember" />
+            <div className="flex justify-end items-center">
               <Link className="text-xs" to="/">
                 Forgot Password?
               </Link>
             </div>
             <Button
               text="Sign In"
-              onClick={() => {
-                redirect("/");
-              }}
+              onClick={handleLogin}
               variant="secondary"
               className="my-5 w-full"
             />
