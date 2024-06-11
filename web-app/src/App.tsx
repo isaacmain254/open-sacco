@@ -44,23 +44,24 @@ const App: FC = () => {
   return (
     <>
       <NavBar />
-      <div className="grid grid-cols-12 gap-4 ">
-        <div className="col-span-2 bg-gray-200 dark:bg-gray-800 dark:text-white min-h-screen p-4 ">
+      <div className="grid grid-cols-12 gap-4  ">
+        <div className="col-span-2 bg-gray-200 dark:bg-blue-950 dark:text-white min-h-screen p-4 ">
           <ul className="list-none p-0 m-0">
             {sidebarItems.map((item) => (
               <li className="" key={item.label}>
+                {/* TODO: check NavLink to set active link bg, color */}
                 <Link
-                  className=" flex gap-x-3 bg-white py-2 px-3 text-base text-slate-600 rounded-md hover:bg-slate-100 hover:text-slate-800 transition duration-300 ease-in-out "
+                  className=" flex gap-x-3 bg-white py-2 px-3 text-base text-slate-800 rounded-md hover:bg-slate-950/25 hover:text-white transition duration-300 ease-in-out  dark:bg-blue-500/25 dark:text-slate-300 dark:hover:bg-blue-500/75"
                   to={item.to}
                 >
                   <LucideIcon name={item.icon} /> {item.label}
                 </Link>
-                <div className=" w-full border border-slate-100 my-5"></div>
+                <div className=" w-full border border-slate-100 dark:border-blue-600 my-5"></div>
               </li>
             ))}
           </ul>
         </div>
-        <div className="col-span-10 bg-white dark:bg-gray-600 dark:text-white p-4">
+        <div className="col-span-10 bg-white dark:bg-blue-950 dark:text-slate-300 p-4">
           <Outlet />
         </div>
       </div>

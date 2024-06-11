@@ -1,7 +1,9 @@
 from django.shortcuts import render
-from rest_framework import viewsets
 from django.contrib.auth.models import User
-from rest_framework import generics
+from django.contrib.auth import logout
+from rest_framework import viewsets, generics, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -28,3 +30,9 @@ class RegisterView(generics.CreateAPIView):
             serializer.is_valid(raise_exception=True)
             response.data['tokens'] = serializer.validated_data
         return response
+
+
+class LogoutView(APIView):
+    def get(self, request):
+        logout(request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
