@@ -22,13 +22,17 @@ const Users = () => {
   return (
     <>
       <div>Users</div>
-      <ul>
-        {users.map((user) => (
-          <li key={user.email}>
-            {user.username} {user.email}
-          </li>
-        ))}
-      </ul>
+      {users.length ? (
+        <ul>
+          {users.map((user) => (
+            <li key={user.email}>
+              {user.username} {user.email}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No users records.</p>
+      )}
     </>
   );
 };

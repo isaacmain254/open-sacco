@@ -41,12 +41,12 @@ const SignIn: FC = () => {
 
   return (
     <div className="w-full h-screen  flex ">
-      <div className="w-3/5 rounded-e-full  text-center flex flex-col justify-center bg-slate-200">
+      <div className="w-3/5 rounded-e-full  text-center flex flex-col justify-center bg-slate-200 dark:bg-gray-600">
         <h1 className="text-4xl font-bold">Welcome back</h1>
         <p>A few more click to get started</p>
       </div>
       <div className="w-2/5">
-        <div className="w-full h-full flex  flex-col  items-center justify-center border border-red-500">
+        <div className="w-full h-full flex  flex-col  items-center justify-center border border-red-500 dark:border-black">
           <div className="mb-7">
             <p>Logo</p>
             <h3>Sign In</h3>
