@@ -15,6 +15,7 @@ import Accounts from "./pages/Accounts.tsx";
 import Loans from "./pages/Loans.tsx";
 import Transactions from "./pages/Transactions.tsx";
 import Users from "./pages/Users.tsx";
+import ForgotPassword from "./pages/auth/ForgotPassword.tsx";
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <SignUp />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
   },
 ]);
 
