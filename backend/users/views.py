@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .serializers import UserSerializer, RegisterSerializer, PasswordResetSerializer
+from .serializers import PasswordResetConfirmSerializer, UserSerializer, RegisterSerializer, PasswordResetSerializer
 
 
 class UserViewList(viewsets.ModelViewSet):
@@ -71,13 +71,14 @@ class PasswordResetRequestView(generics.GenericAPIView):
 
 # TODO: Add SERIALIZER CLASS
 class PasswordResetConfirmView(generics.GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
     permission_classes = (AllowAny,)
 
     def post(self, request, uidb64, token):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.filter(pk=uid).first()
         if user and default_token_generator.check_token(user, token):
-            new_passowrd = request.data.get('new_password')
+            new_passowrd = request.data.get('password')
             user.set_password(new_passowrd)
             user.save()
             return Response(status=status.HTTP_204_NO_CONTENT)

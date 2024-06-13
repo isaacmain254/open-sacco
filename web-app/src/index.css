@@ -3,3 +3,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.spinner {
+  @apply w-6 h-6 border-4 border-t-4 border-blue-200 rounded-full;
+  border-top-color: theme("colors.blue.700");
+  animation: spin 10s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

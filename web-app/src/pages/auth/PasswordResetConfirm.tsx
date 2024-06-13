@@ -1,72 +1,65 @@
-import { FC, useState } from "react";
+import React, { FC, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import LoginSvg from "@/assets/authenticate.svg";
 import Logo from "@/assets/open-sacco.png";
-// components
 import FormInput from "@/components/FormInput";
-import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
+import Button from "@/components/Button";
 
-const SignUp: FC = () => {
-  // TODO: manage input type and icon state independently and validate form input
+const PasswordResetConfirm: FC = () => {
   const [inputType, setInputType] = useState("password");
   const [inputIcon, setInputIcon] = useState("EyeOff");
   const [loading, setLoading] = useState(false);
-
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [password2, setPassword2] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const { uidb64, token } = useParams<{ uidb64: string; token: string }>();
 
-  const navigate = useNavigate();
   // handle password visibility
   const handleIconClick = () => {
     setInputType((prev) => (prev === "password" ? "text" : "password"));
     setInputIcon((prev) => (prev === "EyeOff" ? "Eye" : "EyeOff"));
   };
 
-  // handle signup
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Validate password and confirm password fields
-    if (password !== password2) {
-      alert("Passwords do not match");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match", { autoClose: 2000 });
       return;
     }
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:8000/api/register/", {
-        username,
-        email,
-        password,
-        password2,
-      });
-
-      // Store the token in local storage
-      localStorage.setItem("access_token", response.data.tokens.access);
-      localStorage.setItem("refresh_token", response.data.tokens.refresh);
+      await axios.post(
+        `http://localhost:8000/api/password-reset-confirm/${uidb64}/${token}/`,
+        {
+          password,
+        }
+      );
       setLoading(false);
-      toast.success("Account created successfully", { autoClose: 2000 });
-      // Redirect to the dashboard
-      navigate("/");
+      toast.success("Password reset successful", { autoClose: 2000 });
+      // redirect to login page
+      navigate("/login");
     } catch (error) {
       setLoading(false);
-      toast.error("Error creating account", { autoClose: 2000 });
+      toast.error("Error resetting password. Please request for a new reset", {
+        autoClose: 2000,
+      });
     }
   };
+
   return (
     <div className="w-full h-screen  flex  text-slate-700">
       <div className="w-1/2 rounded-e-full flex flex-col justify-center items-center bg-slate-200 text-center">
         <img src={LoginSvg} alt="login" className="w-72 h-72" />
         <div className="max-w-96 text-left">
-          <h1 className="text-4xl py-5">Create an account</h1>
+          <h1 className="text-4xl py-5">Set new password</h1>
           <p className=" text-lg">
-            Ready to get started? Just a few steps away from joining our
-            community. Please complete the registration form to set up your
-            account.
+            Time to secure your account. Enter your new password to finalize the
+            reset and get back to using your account.
           </p>
         </div>
       </div>
@@ -75,24 +68,7 @@ const SignUp: FC = () => {
           <div className="mb-2">
             <img src={Logo} alt="Open sacco logo" className="w-32 h-32" />
           </div>
-          <form className="w-72 space-y-4" onSubmit={handleSignup}>
-            <FormInput
-              type="text"
-              name="Name"
-              value={username}
-              placeholder="Name"
-              className=""
-              label="Name"
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <FormInput
-              type="email"
-              name="email"
-              value={email}
-              placeholder="Email"
-              label="Email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <form className="w-72 space-y-4" onSubmit={handleSubmit}>
             <FormInput
               type={inputType}
               name="password"
@@ -107,11 +83,11 @@ const SignUp: FC = () => {
               type={inputType}
               name="confirmPassword"
               placeholder="Confirm Password"
-              value={password2}
+              value={confirmPassword}
               label="ConfirmPassword"
               icon={inputIcon}
               onIconClick={handleIconClick}
-              onChange={(e) => setPassword2(e.target.value)}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <Button
               text={loading ? <Spinner /> : "Sign Up"}
@@ -122,9 +98,9 @@ const SignUp: FC = () => {
           </form>
           <div className="border border-slate-300 w-72 mt-7 mb-3"></div>
           <p>
-            Don't have an account?{" "}
-            <Link className="ps-3 text-blue-700" to="/login">
-              Sign In
+            Request for a new password reset?
+            <Link className="ps-3 text-blue-700" to="/forgot-password">
+              Reset now
             </Link>
           </p>
         </div>
@@ -133,4 +109,4 @@ const SignUp: FC = () => {
   );
 };
 
-export default SignUp;
+export default PasswordResetConfirm;

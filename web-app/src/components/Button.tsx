@@ -1,11 +1,12 @@
 import { FC } from "react";
 
 interface ButtonProps {
-  text: string;
-  onClick: (event?: React.MouseEvent<HTMLButtonElement>) => void;
+  text: string | React.ReactNode;
+  onClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   disabled?: boolean;
   variant?: "primary" | "secondary";
+  type?: "button" | "submit" | "reset";
 }
 
 const Button: FC<ButtonProps> = ({

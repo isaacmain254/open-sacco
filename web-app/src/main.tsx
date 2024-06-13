@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 
 import "./index.css";
 // pages
@@ -16,6 +17,8 @@ import Loans from "./pages/Loans.tsx";
 import Transactions from "./pages/Transactions.tsx";
 import Users from "./pages/Users.tsx";
 import ForgotPassword from "./pages/auth/ForgotPassword.tsx";
+import PasswordResetConfirm from "./pages/auth/PasswordResetConfirm.tsx";
+import { ToastContainer } from "react-toastify";
 
 const router = createBrowserRouter([
   {
@@ -65,10 +68,15 @@ const router = createBrowserRouter([
     path: "/forgot-password",
     element: <ForgotPassword />,
   },
+  {
+    path: "/reset-password/:uidb64/:token",
+    element: <PasswordResetConfirm />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <RouterProvider router={router} />
+    <ToastContainer />
   </React.StrictMode>
 );
