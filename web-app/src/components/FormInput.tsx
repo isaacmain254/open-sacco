@@ -27,7 +27,7 @@ const FormInput: React.FC<Props> = ({
 }) => {
   return (
     <div className="relative flex w-full items-center">
-      <label htmlFor="label">
+      <label htmlFor={name}>
         {label}
         <input
           className={` border border-gray-300 rounded-md px-4 py-2  outline-none ${className}`}
@@ -36,6 +36,8 @@ const FormInput: React.FC<Props> = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          autoComplete="true"
+          id={name}
         />
         <i
           onClick={onIconClick}

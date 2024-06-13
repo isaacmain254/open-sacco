@@ -52,7 +52,7 @@ const SignIn: FC = () => {
 
   return (
     <div className="w-full h-screen  flex  text-slate-700">
-      <div className="w-1/2 h-full rounded-e-full  flex flex-col justify-center items-center bg-gray-200">
+      <div className="lg:w-1/2 h-full rounded-e-full  flex flex-col justify-center items-center bg-gray-200 dark:bg-black max-md:hidden">
         <img src={LoginSvg} alt="login" className="w-72 h-72" />
         <div className="max-w-96 text-left">
           <h1 className="text-4xl py-5">Welcome back</h1>
@@ -62,10 +62,11 @@ const SignIn: FC = () => {
           </p>
         </div>
       </div>
-      <div className="w-1/2">
+      <div className="lg:w-1/2 w-full">
         <div className="w-full h-full flex  flex-col  items-center justify-center dark:border-black">
           <div className="mb-2">
             <img src={Logo} alt="Open sacco logo" className="w-32 h-32" />
+            <h3 className="pb-3 text-lg">Welcome back!</h3>
           </div>
           <form className="w-72 space-y-4" onSubmit={handleLogin}>
             <FormInput

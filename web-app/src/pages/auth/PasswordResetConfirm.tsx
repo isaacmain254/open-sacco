@@ -28,7 +28,7 @@ const PasswordResetConfirm: FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match", { autoClose: 2000 });
+      toast.error("Passwords do not match", { autoClose: 3000 });
       return;
     }
     try {
@@ -46,14 +46,14 @@ const PasswordResetConfirm: FC = () => {
     } catch (error) {
       setLoading(false);
       toast.error("Error resetting password. Please request for a new reset", {
-        autoClose: 2000,
+        autoClose: 5000,
       });
     }
   };
 
   return (
-    <div className="w-full h-screen  flex  text-slate-700">
-      <div className="w-1/2 rounded-e-full flex flex-col justify-center items-center bg-slate-200 text-center">
+    <div className="w-full h-screen  flex  text-slate-700 ">
+      <div className="lg:w-1/2 rounded-e-full flex flex-col justify-center items-center bg-slate-200 dark:bg-white text-center max-md:hidden">
         <img src={LoginSvg} alt="login" className="w-72 h-72" />
         <div className="max-w-96 text-left">
           <h1 className="text-4xl py-5">Set new password</h1>
@@ -63,10 +63,11 @@ const PasswordResetConfirm: FC = () => {
           </p>
         </div>
       </div>
-      <div className="w-1/2">
+      <div className="lg:w-1/2 w-full">
         <div className="w-full h-full flex  flex-col  items-center justify-center">
           <div className="mb-2">
             <img src={Logo} alt="Open sacco logo" className="w-32 h-32" />
+            <h3 className="pb-3 text-lg">Set new password</h3>
           </div>
           <form className="w-72 space-y-4" onSubmit={handleSubmit}>
             <FormInput
@@ -99,7 +100,10 @@ const PasswordResetConfirm: FC = () => {
           <div className="border border-slate-300 w-72 mt-7 mb-3"></div>
           <p>
             Request for a new password reset?
-            <Link className="ps-3 text-blue-700" to="/forgot-password">
+            <Link
+              className="ps-3 text-blue-700 max-md:block"
+              to="/forgot-password"
+            >
               Reset now
             </Link>
           </p>
