@@ -45,9 +45,12 @@ const PasswordResetConfirm: FC = () => {
       navigate("/login");
     } catch (error) {
       setLoading(false);
-      toast.error("Error resetting password. Please request for a new reset", {
-        autoClose: 5000,
-      });
+      toast.error(
+        "Error resetting password. Please request for a new reset link",
+        {
+          autoClose: 5000,
+        }
+      );
     }
   };
 
