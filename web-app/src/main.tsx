@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 import "./index.css";
 // pages
@@ -18,7 +19,7 @@ import Transactions from "./pages/Transactions.tsx";
 import Users from "./pages/Users.tsx";
 import ForgotPassword from "./pages/auth/ForgotPassword.tsx";
 import PasswordResetConfirm from "./pages/auth/PasswordResetConfirm.tsx";
-import { ToastContainer } from "react-toastify";
+import Profile from "./pages/Profile.tsx";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "/users",
         element: <Users />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
       },
     ],
   },

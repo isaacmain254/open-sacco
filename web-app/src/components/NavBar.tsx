@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { FC, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import ProfileImage from "@/assets/mainawambui.jpg";
@@ -94,7 +94,10 @@ const NavBar: FC<NavBarProps> = ({
                   Admin
                 </small>
               </p>
-              <p>Admin</p>
+              <p>admin@gmail.com</p>
+              <Link to="/profile" className="text-blue-500 dark:text-blue-300">
+                Profile
+              </Link>
               <div
                 className="flex items-center text-sm gap-x-1 cursor-pointer hover:bg-blue-500/25 p-2 my-2 rounded-md dark:hover:bg-blue-500/75"
                 onClick={handleLogout}

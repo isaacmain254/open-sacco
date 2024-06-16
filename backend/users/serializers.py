@@ -5,6 +5,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.validators import UniqueValidator
 
+from .models import Profile
+
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -50,3 +52,11 @@ class PasswordResetSerializer(serializers.Serializer):
 class PasswordResetConfirmSerializer(serializers.Serializer):
     password = serializers.CharField(
         min_length=8, validators=[validate_password])
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Profile
+        fields = '__all__'
