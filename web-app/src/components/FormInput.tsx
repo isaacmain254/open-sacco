@@ -9,6 +9,7 @@ type Props = {
   placeholder?: string;
   value?: string | number;
   label?: string;
+  disabled?: boolean;
   className?: string;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onIconClick?: () => void;
@@ -22,15 +23,18 @@ const FormInput: React.FC<Props> = ({
   value,
   className,
   label,
+  disabled,
   onChange,
   onIconClick,
 }) => {
   return (
-    <div className="relative flex w-full items-center">
+    <div className="relative flex items-center">
       <label htmlFor={name}>
         {label}
         <input
-          className={` border border-gray-300 rounded-md px-4 py-2  outline-none ${className}`}
+          className={` border border-gray-300  rounded-md px-4 py-2  outline-none  dark:bg-blue-900 dark:text-white dark:border-slate-500 ${
+            disabled ? "cursor-not-allowed" : ""
+          } ${className}`}
           name={name}
           type={type}
           placeholder={placeholder}
@@ -38,6 +42,7 @@ const FormInput: React.FC<Props> = ({
           onChange={onChange}
           autoComplete="true"
           id={name}
+          disabled={disabled}
         />
         <i
           onClick={onIconClick}

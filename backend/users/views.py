@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, generics, status, permissions
+from rest_framework import viewsets, generics, status, permissions, authentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -95,3 +95,12 @@ class ProfileView(APIView):
         profile = Profile.objects.filter(user=request.user)
         serializer = ProfileSerializer(profile, many=True)
         return Response(serializer.data)
+
+    # TODO: This should be a PUT request
+    def put(self, request, *args, **kwargs):
+        profile = Profile.objects.get(user=request.user)
+        serializer = ProfileSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

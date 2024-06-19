@@ -20,6 +20,7 @@ import Users from "./pages/Users.tsx";
 import ForgotPassword from "./pages/auth/ForgotPassword.tsx";
 import PasswordResetConfirm from "./pages/auth/PasswordResetConfirm.tsx";
 import Profile from "./pages/Profile.tsx";
+import { ThemeContextProvider } from "./contexts/ThemeContext.tsx";
 
 const router = createBrowserRouter([
   {
@@ -81,7 +82,9 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
-    <ToastContainer />
+    <ThemeContextProvider>
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </ThemeContextProvider>
   </React.StrictMode>
 );

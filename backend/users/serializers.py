@@ -56,7 +56,11 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    role_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ('user', 'role_display', 'profile_image')
+
+    def get_role_display(self, obj):
+        return obj.get_role_display()

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useContext, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -6,6 +6,8 @@ import ProfileImage from "@/assets/mainawambui.jpg";
 import Logo from "@/assets/open-sacco.png";
 // components
 import LucideIcon from "./LucideIcon";
+import { ThemeContext } from "@/contexts/ThemeContext";
+import { useUserProfileInfo } from "@/hooks/useUserProfile";
 
 interface NavBarProps {
   showMobileMenu: boolean;
@@ -17,29 +19,30 @@ const NavBar: FC<NavBarProps> = ({
   handleMobileMenuToggle,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem("darkMode");
-    const initialValue = JSON.parse(saved!);
-    return initialValue || false;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-    const htmlClassList = document.querySelector("html")?.classList;
-    if (darkMode) {
-      htmlClassList?.add("dark");
-    } else {
-      htmlClassList?.remove("dark");
-    }
-  }, [darkMode]);
+  // dark mode context consumer
+  const { toggleDarkTheme, darkTheme } = useContext(ThemeContext);
+  // custom hook for user profile
+  const { username, email, role, imageUrl } = useUserProfileInfo();
 
   const handleShowDropdown = () => {
     setShowDropdown(!showDropdown);
   };
 
-  const darkModeToggleHandler = () => {
-    setDarkMode(!darkMode);
-  };
+  // close dropdown when user clicks outside
+  const dropdownRef = useRef(null);
+  useEffect(() => {
+    function handleClickOutside(event: any) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    }
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const navigate = useNavigate();
   // handle logout
@@ -55,7 +58,7 @@ const NavBar: FC<NavBarProps> = ({
     }
   };
   return (
-    <div className="w-full flex items-center justify-between text-white bg-blue-700 h-16 dark:bg-blue-800 dark:text-slate-300 rounded-lg px-3 ">
+    <div className="max-w-full relative flex items-center justify-between text-white bg-blue-700 h-16 dark:bg-blue-800 dark:text-slate-300 rounded-lg px-3 ">
       <div className="flex items-center">
         <img src={Logo} alt="Open SACCO logo" className="w-20 h-20" />
         <div className="lg:hidden" onClick={handleMobileMenuToggle}>
@@ -68,8 +71,8 @@ const NavBar: FC<NavBarProps> = ({
       </div>
 
       <div className="flex gap-x-5 items-center">
-        <div onClick={darkModeToggleHandler}>
-          {darkMode ? (
+        <div onClick={toggleDarkTheme}>
+          {darkTheme ? (
             <LucideIcon name="Moon" size={24} />
           ) : (
             <LucideIcon name="Sun" size={24} />
@@ -77,25 +80,31 @@ const NavBar: FC<NavBarProps> = ({
         </div>
         <div>
           <img
-            className="rounded-full relative border border-white w-10 h-10"
-            src={ProfileImage}
+            className="rounded-full  border border-white w-10 h-10"
+            src={`http://localhost:8000${imageUrl}` || ProfileImage}
             alt=" mr Isaac"
             onClick={handleShowDropdown}
           />
+          {/* dropdown menu start here */}
           <div
+            ref={dropdownRef}
             className={` ${
               showDropdown ? "block" : "hidden"
-            } bg-gray-200 text-black  absolute z-50 mt-2 -ms-16 rounded-md dark:bg-blue-700 dark:text-white`}
+            } bg-gray-200 text-black absolute mt-3 me-3 right-0 rounded-md dark:bg-blue-700 dark:text-white`}
           >
             <div className="p-4">
               <p className="">
-                Isaac
-                <small className="bg-blue-700 dark:bg-blue-950 rounded-md text-white text-xs ms-3 p-0.5">
-                  Admin
+                {username}
+                <small className="bg-blue-700 dark:bg-blue-950 rounded-md text-white text-xs p-0.5">
+                  {role}
                 </small>
               </p>
-              <p>admin@gmail.com</p>
-              <Link to="/profile" className="text-blue-500 dark:text-blue-300">
+              <p className="pb-2">{email}</p>
+              <Link
+                to="/profile"
+                className="flex hover:bg-blue-500/25 p-2  rounded-md dark:hover:bg-blue-500/75"
+                onClick={handleShowDropdown}
+              >
                 Profile
               </Link>
               <div

@@ -34,8 +34,8 @@ const ForgotPassword: FC = () => {
     }
   };
   return (
-    <div className="w-full h-screen  flex  text-slate-700 ">
-      <div className="lg:w-1/2 h-full rounded-e-full  flex flex-col justify-center items-center bg-gray-200 max-md:hidden">
+    <div className="w-full h-screen  flex  text-slate-700 dark:bg-blue-900 dark:text-slate-300">
+      <div className="lg:w-1/2 h-full rounded-e-full  flex flex-col justify-center items-center bg-gray-200 max-md:hidden  dark:bg-blue-950 dark:text-slate-300">
         <img src={ForgotPasswordSvg} alt="login" className="w-72 h-72" />
         <div className="max-w-96 text-left">
           <h1 className="text-4xl py-5">Recover your account</h1>
