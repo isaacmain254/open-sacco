@@ -8,17 +8,25 @@ export function useUserProfileInfo() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageSrc, setImageSrc] = useState("");
   // TODO:find a  way to handle input value change
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
-    console.log("value");
   };
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
   const handleImageUrlChange = (e) => {
-    setImageUrl(e.target.value);
+    // const image = e.target.files[0];
+    // setImageUrl(image);
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageSrc(reader.result.toString());
+      };
+      reader.readAsDataURL(file);
+    }
   };
   const navigate = useNavigate();
   useEffect(() => {
@@ -33,10 +41,10 @@ export function useUserProfileInfo() {
           headers: headers,
         });
         setProfile(response.data);
-        setUsername(response.data[0].user.username);
-        setEmail(response.data[0].user.email); // Set email state
-        setRole(response.data[0].role_display);
-        setImageUrl(response.data[0].profile_image);
+        setUsername(response.data.username);
+        setEmail(response.data.email);
+        setRole(response.data.profile.role_display);
+        setImageSrc(response.data.profile.profile_image);
       } catch (error) {
         if (error.response.status === 401) {
           try {
@@ -60,7 +68,7 @@ export function useUserProfileInfo() {
     username,
     email,
     role,
-    imageUrl,
+    imageSrc,
     handleUsernameChange,
     handleEmailChange,
     handleImageUrlChange,

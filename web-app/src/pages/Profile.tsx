@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 // custom hook
@@ -7,19 +7,23 @@ import { useUserProfileInfo } from "@/hooks/useUserProfile";
 import Button from "@/components/Button";
 import FormInput from "@/components/FormInput";
 import Spinner from "@/components/Spinner";
+import LucideIcon from "@/components/LucideIcon";
 
 // FIXME: Profile component not displaying user profile information. The TOKEN expires very fast add way to refresh token
 // TODO: add type to profile state
 const Profile = () => {
   const [loading, setLoading] = useState(false);
+  const [newImage, setNewImage] = useState("");
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     username,
     email,
     role,
-    imageUrl,
+    imageSrc,
     handleUsernameChange,
     handleEmailChange,
+    handleImageUrlChange,
   } = useUserProfileInfo();
   // handle profile update
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -27,26 +31,35 @@ const Profile = () => {
     try {
       setLoading(true);
       const TOKEN = localStorage.getItem("access_token");
-      await axios.put(
-        "http://localhost:8000/api/profile/",
-        {
-          user: {
-            username,
-            email,
-          },
+
+      const formData = new FormData();
+      formData.append("username", username);
+      formData.append("email", email);
+      if (newImage) {
+        formData.append("profile.profile_image", newImage);
+      }
+
+      await axios.patch("http://localhost:8000/api/profile/", formData, {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      });
       toast.success("Account updated successfully", { autoClose: 2000 });
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       toast.error("Error updating account", { autoClose: 2000 });
     }
+  };
+
+  const handleNewImage = (e) => {
+    const file = e.target.files[0];
+    setNewImage(file);
+  };
+
+  const handleImageUpdate = () => {
+    imageInputRef.current?.click();
   };
   return (
     <div className=" w-2/3 mx-auto mt-5">
@@ -56,11 +69,30 @@ const Profile = () => {
           className="max-w-min space-y-4 mb-5"
           onSubmit={handleProfileUpdate}
         >
-          <img
-            src={`http://localhost:8000${imageUrl}`}
-            alt="profile image"
-            className=" w-48 h-48 rounded-full mx-auto object-fill"
+          <div className="relative ">
+            <img
+              src={
+                newImage
+                  ? newImage
+                  : imageSrc && `http://localhost:8000${imageSrc}`
+              }
+              alt="profile image"
+              className=" w-48 h-48 rounded-full mx-auto object-fill"
+            />
+            <LucideIcon
+              name="Camera"
+              className="absolute bottom-4 right-12"
+              onClick={handleImageUpdate}
+            />
+          </div>
+          <input
+            type="file"
+            id="profile_image"
+            onChange={handleNewImage}
+            ref={imageInputRef}
+            className="hidden"
           />
+
           <FormInput
             name={username}
             type="text"
@@ -96,18 +128,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-// <>
-// {profile &&
-//   profile.map((item) => (
-//     <div key={item.id}>
-//       <h1>{item.user.email}</h1>
-//       <p>Username: {item.user.username}</p>
-//       <p>Role: {item.role}</p>
-//       <img
-//         src={`http://127.0.0.1:8000${item.profile_image}`}
-//         alt="Profile"
-//       />
-//     </div>
-//   ))}
-// </>

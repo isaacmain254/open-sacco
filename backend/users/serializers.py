@@ -8,10 +8,40 @@ from rest_framework.validators import UniqueValidator
 from .models import Profile
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    role_display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = ['role_display', 'profile_image']
+
+    def get_role_display(self, obj):
+        return obj.get_role_display()
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    profile = UserProfileSerializer()
+
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['username', 'email', 'profile']
+
+    def create(self, validated_data):
+        profile = validated_data.pop('profile')
+        return User.objects.create(profile=Profile.objects.create(**profile), **validated_data)
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get("username", instance.username)
+        instance.email = validated_data.get("email", instance.email)
+        instance.save()
+
+        if "profile" in validated_data:
+            instance.profile.profile_image = validated_data["profile"].get(
+                "profile_image", instance.profile.profile_image)
+            instance.profile.role = validated_data["profile"].get(
+                "role", instance.profile.role)
+            instance.profile.save()
+        return instance
 
 
 class RegisterSerializer(serializers.ModelSerializer):

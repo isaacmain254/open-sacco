@@ -3,7 +3,7 @@ import React, { ChangeEvent } from "react";
 import LucideIcon from "./LucideIcon";
 
 type Props = {
-  name: string;
+  name?: string;
   type: string;
   icon?: string;
   placeholder?: string;
@@ -11,6 +11,8 @@ type Props = {
   label?: string;
   disabled?: boolean;
   className?: string;
+  accept?: string;
+  ref?: React.RefObject<HTMLInputElement>;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onIconClick?: () => void;
 };
@@ -23,9 +25,11 @@ const FormInput: React.FC<Props> = ({
   value,
   className,
   label,
+  accept,
   disabled,
   onChange,
   onIconClick,
+  ref,
 }) => {
   return (
     <div className="relative flex items-center">
@@ -39,10 +43,12 @@ const FormInput: React.FC<Props> = ({
           type={type}
           placeholder={placeholder}
           value={value}
+          accept={accept}
           onChange={onChange}
           autoComplete="true"
           id={name}
           disabled={disabled}
+          ref={ref}
         />
         <i
           onClick={onIconClick}
