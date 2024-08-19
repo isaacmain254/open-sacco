@@ -2,12 +2,15 @@ import { FC, useContext, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import ProfileImage from "@/assets/mainawambui.jpg";
+import ProfilePlaceholder from "@/assets/profile-placeholder.png";
 import Logo from "@/assets/open-sacco.png";
 // components
 import LucideIcon from "./LucideIcon";
+// contest and custom hook
 import { ThemeContext } from "@/contexts/ThemeContext";
 import { useUserProfileInfo } from "@/hooks/useUserProfile";
+// constants
+import { apiBaseUrl } from "@/constants";
 
 interface NavBarProps {
   showMobileMenu: boolean;
@@ -21,18 +24,19 @@ const NavBar: FC<NavBarProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   // dark mode context consumer
   const { toggleDarkTheme, darkTheme } = useContext(ThemeContext);
+
   // custom hook for user profile
-  const { username, email, role, imageUrl } = useUserProfileInfo();
+  const {profile } = useUserProfileInfo();
 
   const handleShowDropdown = () => {
     setShowDropdown(!showDropdown);
   };
 
-  // close dropdown when user clicks outside
-  const dropdownRef = useRef(null);
+  // close dropdown when user clicks outside the dropdown
+  const dropdownRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    function handleClickOutside(event: any) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current?.contains(event.target as Node)) {
         setShowDropdown(false);
       }
     }
@@ -45,10 +49,11 @@ const NavBar: FC<NavBarProps> = ({
   }, []);
 
   const navigate = useNavigate();
+
   // handle logout
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:8000/api/logout/");
+      await axios.get(`${apiBaseUrl}/api/logout/`);
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       // TODO: Confirm dialog before logout and redirect to login page - modal with different sizes
@@ -81,7 +86,8 @@ const NavBar: FC<NavBarProps> = ({
         <div>
           <img
             className="rounded-full  border border-white w-10 h-10"
-            src={`http://localhost:8000${imageUrl}` || ProfileImage}
+            src={ profile?.profile.profile_image ? `${apiBaseUrl}${profile?.profile.profile_image}` : ProfilePlaceholder}
+            // src={ProfileImage}
             alt=" mr Isaac"
             onClick={handleShowDropdown}
           />
@@ -90,16 +96,16 @@ const NavBar: FC<NavBarProps> = ({
             ref={dropdownRef}
             className={` ${
               showDropdown ? "block" : "hidden"
-            } bg-gray-200 text-black absolute mt-3 me-3 right-0 rounded-md dark:bg-blue-700 dark:text-white`}
+            } bg-gray-200 text-black absolute z-20 mt-3 me-3 right-0 rounded-md dark:bg-blue-700 dark:text-white`}
           >
             <div className="p-4">
               <p className="">
-                {username}
+                {profile?.username}
                 <small className="bg-blue-700 dark:bg-blue-950 rounded-md text-white text-xs p-0.5">
-                  {role}
+                  {profile?.profile.role_display}
                 </small>
               </p>
-              <p className="pb-2">{email}</p>
+              <p className="pb-2">{profile?.email}</p>
               <Link
                 to="/profile"
                 className="flex hover:bg-blue-500/25 p-2  rounded-md dark:hover:bg-blue-500/75"

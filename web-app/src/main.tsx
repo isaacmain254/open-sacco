@@ -7,20 +7,29 @@ import { ToastContainer } from "react-toastify";
 import "./index.css";
 // pages
 import App from "./App.tsx";
-import SignIn from "./pages/auth/SignIn.tsx";
-import SignUp from "./pages/auth/SignUp.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import DashBoard from "./pages/DashBoard.tsx";
-import Members from "./pages/Members.tsx";
-import Settings from "./pages/Settings.tsx";
-import Accounts from "./pages/Accounts.tsx";
-import Loans from "./pages/Loans.tsx";
-import Transactions from "./pages/Transactions.tsx";
-import Users from "./pages/Users.tsx";
+// authentication
+import SignIn from "./pages/auth/SignIn.tsx";
+import SignUp from "./pages/auth/SignUp.tsx";
 import ForgotPassword from "./pages/auth/ForgotPassword.tsx";
 import PasswordResetConfirm from "./pages/auth/PasswordResetConfirm.tsx";
+// customers
+import Customers from "./pages/customers/Customers.tsx";
+import CustomersEdit from "./pages/customers/CustomersEdit.tsx";
+import CustomersView from "./pages/customers/CustomersView.tsx";
+// accounts
+import Accounts from "./pages/accounts/Accounts.tsx";
+import AccountsEdit from "./pages/accounts/AccoutsEdit.tsx";
+import AccountsView from "./pages/accounts/AccountsView.tsx";
+import Settings from "./pages/Settings.tsx";
+import Loans from "./pages/loans/Loans.tsx";
+import Transactions from "./pages/Transactions.tsx";
+import Users from "./pages/Users.tsx";
 import Profile from "./pages/Profile.tsx";
 import { ThemeContextProvider } from "./contexts/ThemeContext.tsx";
+import LoansEdit from "./pages/loans/LoansEdit.tsx";
+import LoansView from "./pages/loans/LoansView.tsx";
 
 const router = createBrowserRouter([
   {
@@ -33,12 +42,28 @@ const router = createBrowserRouter([
         element: <DashBoard />,
       },
       {
-        path: "/members",
-        element: <Members />,
+        path: "/customers",
+        element: <Customers />,
+      },
+      {
+        path: "/customers/edit/:customerId?",
+        element: <CustomersEdit />,
+      },
+      {
+        path: "/customers/view/:customerId",
+        element: <CustomersView />
       },
       {
         path: "/accounts",
         element: <Accounts />,
+      },
+      {
+        path: '/accounts/edit/:accountNo?',
+        element: <AccountsEdit />
+      },
+      {
+        path: '/accounts/view/:accountNo',
+        element: <AccountsView />
       },
       {
         path: "/transactions",
@@ -47,6 +72,14 @@ const router = createBrowserRouter([
       {
         path: "/loans",
         element: <Loans />,
+      },
+      {
+        path: "/loans/edit/:loanId?",
+        element: <LoansEdit />,
+      },
+      {
+        path: "/loans/view/:loanId",
+        element: <LoansView />
       },
       {
         path: "/settings",

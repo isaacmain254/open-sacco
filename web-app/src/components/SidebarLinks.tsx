@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { NavLink } from "react-router-dom";
+// components
 import LucideIcon from "./LucideIcon";
 
 interface SidebarLinksProps {
@@ -13,9 +14,9 @@ const sidebarItems = [
     to: "/",
   },
   {
-    label: "Members",
+    label: "Customers",
     icon: "Users",
-    to: "/members",
+    to: "/customers",
   },
   {
     label: "Accounts",
