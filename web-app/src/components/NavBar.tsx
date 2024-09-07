@@ -6,7 +6,7 @@ import ProfilePlaceholder from "@/assets/profile-placeholder.png";
 import Logo from "@/assets/open-sacco.png";
 // components
 import LucideIcon from "./LucideIcon";
-// contest and custom hook
+// context and custom hook
 import { ThemeContext } from "@/contexts/ThemeContext";
 import { useUserProfileInfo } from "@/hooks/useUserProfile";
 // constants

@@ -1,5 +1,8 @@
 from django.shortcuts import render, HttpResponse
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.db.models import Sum
 
 from .models import Customer, Account, Transaction, Loan
 from .serializers import CustomerSerializer, AccountSerializer, TransactionSerializer, LoanSerializer
@@ -20,6 +23,12 @@ class AccountViewSet(viewsets.ModelViewSet):
         if customer_id:
             queryset = queryset.filter(customer=customer_id)
         return queryset
+
+    @action(detail=False, methods=['get'])
+    def total_balance(self, request):
+        total = Account.objects.aggregate(total_balance=Sum('balance'))[
+            'total_balance']
+        return Response({'total_balance': total})
 
 
 class TransactionViewSet(viewsets.ModelViewSet):

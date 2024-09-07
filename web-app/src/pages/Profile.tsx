@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { toast } from "react-toastify";
+import React, {  useRef, useState } from "react";
+// import { toast } from "react-toastify";
 import axios from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -10,13 +10,11 @@ import { apiBaseUrl } from "@/constants";
 import { useUserProfileInfo } from "@/hooks/useUserProfile";
 // components
 import Button from "@/components/Button";
-import FormInput from "@/components/FormInput";
 import Spinner from "@/components/Spinner";
 import LucideIcon from "@/components/LucideIcon";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -43,9 +41,9 @@ const formSchema = z.object({
 const Profile = () => {
   const { profile } = useUserProfileInfo();
   const [loading, setLoading] = useState(false);
-  const [preview, setPreview] = useState();
+  const [preview, setPreview] = useState('');
 
-  const imageInputRef = useRef();
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleImageUpdate = () => {
     imageInputRef.current?.click();
@@ -54,54 +52,57 @@ const Profile = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "admin",
-      email: "admin@opensacco.com",
+      username: "",
+      email: "",
       profile: {
-        role_display: "Admin",
-        // profile_image: undefined,
+        role_display: "",
+        // profile_image: null,
       },
     },
-    // values: profile,
+    values: profile,
   });
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0];
     if(file){
-    const imageUrl = URL.createObjectURL(file);
-    setPreview(imageUrl);
-     form.setValue('profile.profile_image', file)
+      const imageUrl = URL.createObjectURL(file);
+      setPreview(imageUrl);
+      // form.setValue('profile.profile_image', file)
     }
   };
+
   // TODO: image upload not working issue  might be on the server or schema
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
     const TOKEN = localStorage.getItem("access_token");
  
-    const formData = new FormData()
-    formData.append('username', values.username)
-    formData.append('email', values.email)
-   // Ensure profile_image is a valid File object
-   if (values.profile.profile_image instanceof File) {
-    formData.append('profile_image', values.profile.profile_image);
-} else {
-    console.error('profile_image is not a valid File object:', values.profile.profile_image);
-}
+//     const formData = new FormData()
+//     formData.append('username', values.username)
+//     formData.append('email', values.email)
+//    // Ensure profile_image is a valid File object
+//    if (values.profile.profile_image instanceof File) {
+//     formData.append('profile_image', values.profile.profile_image);
+// } else {
+//     console.error('profile_image is not a valid File object:', values.profile.profile_image);
+// }
 
     // Log FormData entries
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-  }
-
+  //   for (let [key, value] of formData.entries()) {
+  //     console.log(`${key}:`, value);
+  // }
+setLoading(true)
     try{
-    await axios.patch(`${apiBaseUrl}/api/profile/`, formData, {
+    await axios.patch(`${apiBaseUrl}/api/profile/`, values, {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
         // "Content-Type": "application/json"
         "Content-Type": "multipart/form-data",
       },
     })
+    setLoading(false)
     console.log('Profile updated successfully')
   } catch (error) {
+    setLoading(false)
     console.log('error', error)
   }
   };
@@ -117,13 +118,14 @@ const Profile = () => {
           >
             <div className="relative ">
               <img
-                src={
-                  profile?.profile.profile_image
-                    ? `${apiBaseUrl}${profile?.profile.profile_image}`
-                    : preview
-                    ? preview
-                    : ProfilePlaceholder
-                }
+              // src={preview ? preview : ProfilePlaceholder }
+              src={
+                preview
+                  ? preview
+                  : profile?.profile.profile_image
+                  ? `${apiBaseUrl}${profile?.profile.profile_image}`
+                  : ProfilePlaceholder
+              }
                 alt="profile image"
                 className=" w-48 h-48 rounded-full mx-auto object-fill"
               />
@@ -137,17 +139,18 @@ const Profile = () => {
               control={form.control}
               name="profile.profile_image"
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              render={({ field: { value, onChange, ...field } }) => (
+              render={({ field: { value, onChange, ...fieldProps } }) => (
                 <FormItem>
                   <FormLabel>Profile Image:</FormLabel>
                   <FormControl>
                     <Input
                       placeholder=""
-                      {...field}
+                      {...fieldProps}
                       accept="image/*"
                       type="file"
-                      value={undefined}
-                      onChange={(event) => onChange(event.target.files && event.target.files[0])}
+                      // value={undefined}
+                      onChange={handleImageUpload}
+                      // onChange={(event) => onChange(event.target.files && event.target.files[0])}
                       ref={imageInputRef}
                     />
                   </FormControl>

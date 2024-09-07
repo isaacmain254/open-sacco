@@ -39,6 +39,11 @@ const sidebarItems = [
     to: "/settings",
   },
   {
+    label: 'Help',
+    icon: 'CircleHelp',
+    to: '/help'
+  },
+  {
     label: "Users",
     icon: "Users",
     to: "/users",

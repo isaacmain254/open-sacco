@@ -1,76 +1,87 @@
-import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import React from "react";
+import { Link } from "react-router-dom";
 
-type Loans = {
-  customerId: string
-  loanId: string
-  loanType: string
-  amount: number
-  balance: number
-  status: 'Active' | 'Closed' | 'Suspended' | 'Dormant'
-}
+import { useDataFetch } from "@/hooks/useDataFetch";
+// componnts
+import Spinner from "@/components/Spinner";
+import { DataTable } from "@/components/data-table";
+import LucideIcon from "@/components/LucideIcon";
+// types
+import { LoanProps } from "@/types";
 
-const loans:Loans[] = [
+
+const columns: ColumnDef<LoanProps>[] = [
   {
-    customerId: '56690780',
-    loanId: '568767',
-    loanType: '7576576',
-    amount: 78000,
-    balance: 78000,
-    status: 'Active'
+    header: "Customer ID",
+    cell: ({ row }) => {
+      return (
+        <div>
+          <Link to={`/loans/view/${row.original.loan_id}`}>
+            {row.original.account}
+          </Link>
+        </div>
+      );
+    },
   },
   {
-    customerId: '56690780',
-    loanId: '568767',
-    loanType: '7576576',
-    amount: 78000,
-    balance: 78000,
-    status: 'Active'
+    header: "Loan Type",
+    accessorKey: "loan_type",
   },
   {
-    customerId: '56690780',
-    loanId: '568767',
-    loanType: '7576576',
-    amount: 78000,
-    balance: 78000,
-    status: 'Active'
-  }
-]
-
-const columns:ColumnDef<Loans>[] = [
-{
-  header: 'Customer Id',
-  accessorKey: 'customerId'
-},
-{
-  header: 'Loan Id',
-  accessorKey: 'loanId'
-},
-{
-  header: 'Loan Type',
-  accessorKey: 'loanType'
-},
-{
-  header: 'Ammount',
-  accessorKey: 'amount'
-},
- {
-header: 'Balance',
-accessorKey: 'balance'
-},
-{
-  header: 'Status',
-  accessorKey: 'status'
-}
-]
+    header: "Amount",
+    accessorKey: "amount",
+  },
+  {
+    header: "Balance",
+    accessorKey: "loan_balance",
+  },
+  {
+    header: "Status",
+    accessorKey: "loan_status",
+  },
+  {
+    header: "Actions",
+    cell: ({ row }) => {
+      return (
+        <div>
+          <Link to={`/loans/edit/${row.original.loan_id}`}>
+            <LucideIcon name="Pen" size={18} />{" "}
+          </Link>
+        </div>
+      );
+    },
+  },
+];
 
 const Loans = () => {
-  return(
+  const { data, loading, error } = useDataFetch<LoanProps>("loans");
+  // Show loading indicator when loading
+  if (loading)
+    return (
+      <div className="w-full min-h-screen flex justify-center items-center">
+        <Spinner />
+      </div>
+    );
+
+  // handling error
+  if (error)
+    return (
+      <div className="w-full min-h-screen flex justify-center items-center">
+        Error : {error.message}
+      </div>
+    );
+  return (
     <>
-    <DataTable title="Loans" btnTitle="Apply Loan" route="/loans/edit" columns={columns} data={loans} />
+      <DataTable
+        title="Loans"
+        btnTitle="Apply Loan"
+        route="/loans/edit"
+        columns={columns}
+        data={data}
+        filters="account"
+      />
     </>
-  )
+  );
 };
 
 export default Loans;

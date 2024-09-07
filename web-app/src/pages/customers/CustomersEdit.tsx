@@ -1,18 +1,22 @@
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
 
+import { useFetchSingleObject } from "@/hooks/useFetchSingleObject";
 import { cn } from "@/lib/utils";
+import { apiBaseUrl } from "@/constants";
 // components
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+// import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -32,47 +36,98 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-// type Props = {}
+import Spinner from "@/components/Spinner";
+// types
+import { CustomerProps } from "@/types";
+import { toast } from "react-toastify";
+
+// form validation
 const formSchema = z.object({
-  accountId: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  salutation: z.string().refine((value) => value !== "", {
+    message: "Please select an option.",
   }),
-  nationalId: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  first_name: z.string().min(2, {
+    message: "First name must be at least 2 characters.",
   }),
-  dob: z.date({
+  middle_name: z.string().min(2, {
+    message: "Middle name must be at least 2 characters.",
+  }),
+  last_name: z.string().min(2, {
+    message: "Last name must be at least 2 characters.",
+  }),
+  id_number: z.string().max(10).min(2, { message: "ID number is required" }),
+  phone_number: z.string({ required_error: "Phone number is required" }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  date_of_birth: z.date({
     required_error: "A date of birth is required.",
   }),
+  tax_number: z.string({ required_error: "Tax number is required" }),
+  country: z.string({ required_error: "Country is required" }),
+  county: z.string({ required_error: "County is required" }),
+  city: z.string({ required_error: "City is required" }),
+  po_box: z.coerce.number().min(2, { message: "P.O Box required" }),
 });
 
 const CustomersEdit = () => {
-  
+  const { customerId } = useParams();
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
+  const { data: customer } = useFetchSingleObject<CustomerProps>(
+    `customers/${customerId}`, customerId ? true : false
+  );
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      accountId: "",
-      nationalId: "",
       salutation: "",
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      phoneNumber: "",
+      first_name: "",
+      middle_name: "",
+      last_name: "",
+      id_number: "",
+      phone_number: "",
       email: "",
-      dob: "",
-      kraPin: "",
+      tax_number: "",
       country: "",
       county: "",
-      ward: "",
       city: "",
-      boxNo: "",
+      po_box: 0
     },
+    values: customer
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+    setLoading(true);
+    try {
+      // Format the date_of_birth to YYYY-MM-DD
+      const formattedValues = {
+        ...values,
+        date_of_birth: format(values.date_of_birth, "yyyy-MM-dd"),
+      };
+      if (customerId) {
+        await axios.patch(`${apiBaseUrl}/customers/${customerId}/`, formattedValues);
+        toast.success("Customer information updated successfully");
+      } else {
+        await axios.post(`${apiBaseUrl}/customers/`, formattedValues);
+        toast.success("Customer created successfully");
+      }
+      setLoading(false);
+      navigate("/customers")
+    } catch (error) {
+      setLoading(false);
+      toast.error("Hmmm! Something went wrong. Please check and try again");
+      console.log(error);
+    }
   }
+
+  if (loading)
+    return (
+      <div className="w-full min-h-screen flex justify-center items-center">
+        <Spinner />
+      </div>
+    );
+
   return (
     <div>
       <h1 className="text-2xl font-medium">New Customer</h1>
@@ -81,7 +136,7 @@ const CustomersEdit = () => {
           {/* customers details */}
           <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 pb-5">
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="accountId"
                 render={({ field }) => (
@@ -98,10 +153,10 @@ const CustomersEdit = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
               <FormField
                 control={form.control}
-                name="nationalId"
+                name="id_number"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>ID No.</FormLabel>
@@ -112,7 +167,6 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -126,12 +180,12 @@ const CustomersEdit = () => {
                   <FormItem>
                     <FormLabel>Salutation</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
+                      onValueChange={v => v!= "" && field.onChange(v)}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a verified email to display" />
+                          <SelectValue placeholder="Select salutation" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -140,16 +194,13 @@ const CustomersEdit = () => {
                         <SelectItem value="Miss">Miss</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      You can manage email addresses in your
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="firstName"
+                name="first_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>First Name</FormLabel>
@@ -160,14 +211,13 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="middleName"
+                name="middle_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Middle Name</FormLabel>
@@ -178,14 +228,13 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="lastName"
+                name="last_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Last Name</FormLabel>
@@ -196,14 +245,13 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="phoneNumber"
+                name="phone_number"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
@@ -214,7 +262,6 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -232,14 +279,13 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="dob"
+                name="date_of_birth"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Date of birth</FormLabel>
@@ -274,16 +320,13 @@ const CustomersEdit = () => {
                         />
                       </PopoverContent>
                     </Popover>
-                    {/* <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription> */}
                     <FormMessage />
                   </FormItem>
                 )}
               />
-                <FormField
+              <FormField
                 control={form.control}
-                name="taxNo"
+                name="tax_number"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tax No.</FormLabel>
@@ -294,7 +337,6 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>KRA PIN</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -306,8 +348,7 @@ const CustomersEdit = () => {
             <div className="w-full text-lg font-medium ">Addresses</div>
             <Separator className="my-4 bg-slate-400" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            
-            <FormField
+              <FormField
                 control={form.control}
                 name="country"
                 render={({ field }) => (
@@ -320,7 +361,6 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -338,12 +378,11 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-               <FormField
+              {/* <FormField
                 control={form.control}
                 name="ward"
                 render={({ field }) => (
@@ -360,8 +399,8 @@ const CustomersEdit = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-             <FormField
+              /> */}
+              <FormField
                 control={form.control}
                 name="city"
                 render={({ field }) => (
@@ -374,25 +413,24 @@ const CustomersEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-             <FormField
+              <FormField
                 control={form.control}
-                name="boxNo"
+                name="po_box"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>P.O. Box</FormLabel>
                     <FormControl>
                       <Input
                         placeholder=""
+                        type="number"
                         {...field}
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

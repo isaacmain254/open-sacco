@@ -1,10 +1,8 @@
-import React from 'react'
 
-type Props = {}
 
-const AccountsView = (props: Props) => {
+const AccountsView = () => {
   return (
-    <div>AccountsView</div>
+    <div>AccountsView under development</div>
   )
 }
 

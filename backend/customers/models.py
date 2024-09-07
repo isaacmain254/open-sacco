@@ -14,7 +14,7 @@ class Customer(models.Model):
         PROF = 'Prof.', _('Prof.')
         REV = 'Rev.', _('Rev.')
 
-    Salutation = models.CharField(
+    salutation = models.CharField(
         max_length=5, choices=Salutation.choices, default=Salutation.MR)
     first_name = models.CharField(max_length=100)
     middle_name = models.CharField(max_length=100)
@@ -53,9 +53,12 @@ class Account(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     account_number = models.CharField(
         max_length=50, primary_key=True, editable=False, unique=True)
+    # Add account name choices field
+    # account_name = models.CharField(max_length=100)
     account_type = models.CharField(
         max_length=50, choices=AccountType.choices, default=AccountType.SAVINGS)
-    balance = models.DecimalField(max_digits=13, decimal_places=2)
+    balance = models.DecimalField(
+        max_digits=13, decimal_places=2, default=0.00)
     date_opened = models.DateField(auto_now_add=True)
     status = models.CharField(
         max_length=50, choices=AccountStatus.choices, default=AccountStatus.ACTIVE)
@@ -92,6 +95,9 @@ class Transaction(models.Model):
     description = models.TextField()
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     served_by = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = ['-transaction_date']
 
     def __str__(self):
         return self.transaction_id
@@ -131,3 +137,6 @@ class Loan(models.Model):
     date_approved = models.DateField(auto_now_add=True)
     # date_due = models.DateField()
     # date_closed = models.DateField()
+
+    class Meta:
+        ordering = ['-date_approved']

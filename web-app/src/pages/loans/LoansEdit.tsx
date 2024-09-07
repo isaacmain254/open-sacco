@@ -1,13 +1,17 @@
-import React from "react";
-import { z } from "zod";
+// import React from "react";
+import {  z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+// import { useParams } from "react-router-dom";
+
+// import { useFetchSingleObject } from "@/hooks/useFetchSingleObject";
 // components
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -29,20 +33,33 @@ import {
   } from "@/components/ui/popover";
   import { Button } from "@/components/ui/button";
   import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+// types
+// import { LoanProps } from "@/types";
 // type Props = {}
 
 const formSchema = z.object({
-  accountNo: z.string(),
+  account: z.string(),
+  customerId: z.coerce.number(),
+first_name: z.string(),
+last_name: z.string(),
+loan_type:  z.string().refine((value) => value !== "", {
+    message: "Please select an option.",
+  }),
+amount: z.coerce.number(),
+date: z.date(),
+due_date: z.date()
 });
 
 const LoansEdit = () => {
+  // const {loanId} = useParams()
+  // const {data: loanDetails} = useFetchSingleObject<LoanProps>(`loans/${loanId}`, loanId ? true : false)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      accountNo: "",
+      // accountNo: "",
     },
+    // values: loanDetails
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -50,7 +67,7 @@ const LoansEdit = () => {
   };
   return (
     <div>
-      <h1 className="text-2xl font-medium">New Member</h1>
+      <h1 className="text-2xl font-medium">New Loan</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* customers details */}
@@ -58,10 +75,10 @@ const LoansEdit = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 pb-5">
               <FormField
                 control={form.control}
-                name="accountId"
+                name="account"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer Id</FormLabel>
+                    <FormLabel>Account No</FormLabel>
                     <FormControl>
                       <Input
                         placeholder=""
@@ -69,7 +86,6 @@ const LoansEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>customer Id</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -79,7 +95,7 @@ const LoansEdit = () => {
                 name="customerId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer Id</FormLabel>
+                    <FormLabel>ID Number</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="345893"
@@ -87,14 +103,13 @@ const LoansEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="firstName"
+                name="first_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>First Name</FormLabel>
@@ -105,14 +120,13 @@ const LoansEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    {/* <FormDescription>Identification number</FormDescription> */}
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="lastName"
+                name="last_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Last Name</FormLabel>
@@ -123,7 +137,6 @@ const LoansEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    <FormDescription>Identification number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -137,7 +150,7 @@ const LoansEdit = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               <FormField
                 control={form.control}
-                name="loanType"
+                name="loan_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Loan Type</FormLabel>
@@ -147,7 +160,7 @@ const LoansEdit = () => {
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a verified email to display" />
+                          <SelectValue placeholder="Select a loan type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -157,9 +170,6 @@ const LoansEdit = () => {
                         <SelectItem value="development">Development</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      You can manage email addresses in your
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -177,7 +187,6 @@ const LoansEdit = () => {
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
-                    {/* <FormDescription>Identification number</FormDescription> */}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -219,16 +228,13 @@ const LoansEdit = () => {
                         />
                       </PopoverContent>
                     </Popover>
-                    {/* <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription> */}
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="dueDate"
+                name="due_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Due Date</FormLabel>
@@ -263,9 +269,6 @@ const LoansEdit = () => {
                         />
                       </PopoverContent>
                     </Popover>
-                    {/* <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription> */}
                     <FormMessage />
                   </FormItem>
                 )}

@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { ColumnDef } from "@tanstack/react-table";
+import { useDataFetch } from "@/hooks/useDataFetch";
 // components
 import { DataTable } from "@/components/data-table";
 import Spinner from "@/components/Spinner";
@@ -17,7 +16,7 @@ const columns: ColumnDef<UserProps>[] = [
     cell: ({ row }) => {
       return (
         <img
-          src={row.original.profile.profile_image ? row.original.profile.profile_image : ProfilePlaceholder}
+          src={row.original.profile.profile_image ? row.original.profile.profile_image.toString() : ProfilePlaceholder}
           alt={row.original.username}
           className="w-10 h-10 rounded-full"
         />
@@ -38,30 +37,8 @@ const columns: ColumnDef<UserProps>[] = [
   },
 ];
 
-const Users = () => {
-  const [users, setUsers] = useState<UserProps[]>([]);
-  const [error, setError] = useState<Error | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  // fetcher users function
-  const fetchUsers = async () => {
-    setLoading(true)
-    try {
-      const response = await axios.get("http://127.0.0.1:8000/users");
-      setUsers(response.data);
-      setLoading(false)
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setError(error);
-      } else {
-        setError(new Error("An error occurred"));
-      }
-     setLoading(false)
-    }
-  };
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+const Users = () => {  
+  const {data, loading, error} = useDataFetch<UserProps>('users')
 
   // Show loading indicator when loading
   if (loading) return <div className="w-full min-h-screen flex justify-center items-center"><Spinner /></div>
@@ -74,7 +51,7 @@ const Users = () => {
         title="Users"
         route="/users/edit"
         btnTitle="Create User"
-        data={users}
+        data={data}
         columns={columns}
         filters= 'username'
       />

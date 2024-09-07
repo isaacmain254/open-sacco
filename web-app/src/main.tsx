@@ -22,14 +22,17 @@ import CustomersView from "./pages/customers/CustomersView.tsx";
 import Accounts from "./pages/accounts/Accounts.tsx";
 import AccountsEdit from "./pages/accounts/AccoutsEdit.tsx";
 import AccountsView from "./pages/accounts/AccountsView.tsx";
+// Transactions
+import Transactions from "./pages/transactions/Transactions.tsx";
+import TransactionsEdit from "./pages/transactions/TransactionsEdit.tsx";
 import Settings from "./pages/Settings.tsx";
 import Loans from "./pages/loans/Loans.tsx";
-import Transactions from "./pages/Transactions.tsx";
 import Users from "./pages/Users.tsx";
 import Profile from "./pages/Profile.tsx";
 import { ThemeContextProvider } from "./contexts/ThemeContext.tsx";
 import LoansEdit from "./pages/loans/LoansEdit.tsx";
 import LoansView from "./pages/loans/LoansView.tsx";
+import Help from "./pages/Help.tsx";
 
 const router = createBrowserRouter([
   {
@@ -70,6 +73,10 @@ const router = createBrowserRouter([
         element: <Transactions />,
       },
       {
+        path: '/transactions/edit/:transactionId?',
+        element: <TransactionsEdit />
+      },
+      {
         path: "/loans",
         element: <Loans />,
       },
@@ -84,6 +91,10 @@ const router = createBrowserRouter([
       {
         path: "/settings",
         element: <Settings />,
+      },
+      {
+        path: "/help",
+        element: <Help />
       },
       {
         path: "/users",

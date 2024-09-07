@@ -1,8 +1,6 @@
-import React from 'react'
 
-type Props = {}
 
-const LoansView = (props: Props) => {
+const LoansView = () => {
   return (
     <div>LoansView</div>
   )

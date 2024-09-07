@@ -21,16 +21,14 @@ import {
 } from "@/components/ui/table";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  route?: string
-  title?: string,
-  btnTitle?: string
-  filters: string
+  route?: string;
+  title?: string;
+  btnTitle?: string;
+  filters: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -39,12 +37,9 @@ export function DataTable<TData, TValue>({
   route,
   btnTitle,
   title,
-  filters
+  filters,
 }: DataTableProps<TData, TValue>) {
-
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-        []
-      )
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const table = useReactTable({
     data,
     columns,
@@ -53,17 +48,21 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     state: {
-        columnFilters
-    }
+      columnFilters,
+    },
   });
 
   return (
     <div>
       <h1 className="text-2xl font-medium">{title}</h1>
       <div className="flex flex-col md:flex-row justify-between items-center py-5 gap-y-4">
-       {/* <Button>Create Customer</Button> */}
-       <Link className="self-start" to={route ? route : ''}><Button className="flex gap-x-2"><CirclePlus size={18} />{btnTitle}</Button></Link>
-       <Input
+        <Link className="self-start" to={route ? route : ""}>
+          <Button className="flex gap-x-2">
+            <CirclePlus size={18} />
+            {btnTitle}
+          </Button>
+        </Link>
+        <Input
           placeholder="Search ..."
           value={(table.getColumn(filters)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
@@ -122,23 +121,73 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+      <div className="flex justify-between my-5">
+        <div className="space-x-3">
+          <button
+            className="border rounded p-2"
+            onClick={() => table.firstPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            {"<<"}
+          </button>
+          <button
+            className="border rounded p-2"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            {"<"}
+          </button>
+          <button
+            className="border rounded p-2"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            {">"}
+          </button>
+          <button
+            className="border rounded p-2"
+            onClick={() => table.lastPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            {">>"}
+          </button>
+        </div>
+        <div className="flex gap-x-3">
+          <span className="flex items-center gap-1">
+            <div>Page</div>
+            <strong>
+              {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount().toLocaleString()}
+            </strong>
+          </span>
+          <span className="flex items-center gap-1">
+            | Go to page:
+            <input
+              type="number"
+              min="1"
+              max={table.getPageCount()}
+              defaultValue={table.getState().pagination.pageIndex + 1}
+              onChange={(e) => {
+                const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                table.setPageIndex(page);
+              }}
+              className="border p-1 rounded w-16 dark:bg-blue-900"
+            />
+          </span>
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => {
+              table.setPageSize(Number(e.target.value));
+            }}
+            className="dark:bg-blue-900 rounded-md px-1"
+          >
+            {[10, 25, 50, 75, 100].map((pageSize) => (
+              <option key={pageSize} value={pageSize}>
+                Show {pageSize}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );
