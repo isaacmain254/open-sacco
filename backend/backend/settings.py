@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-k87*u8p&=#9_sf3b#q-h-hj-ds4^7yjl)!eq+e%lu2u)jcdnx$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -143,7 +143,8 @@ EMAIL_HOST_PASSWORD = 'ahyr akks lcxp zfrg'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    "http://127.0.0.1:3000",
+    "https://open-sacco.vercel.app"
 ]
 
 REST_FRAMEWORK = {
