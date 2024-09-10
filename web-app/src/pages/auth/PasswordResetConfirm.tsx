@@ -8,6 +8,7 @@ import Logo from "@/assets/open-sacco.png";
 import FormInput from "@/components/FormInput";
 import Spinner from "@/components/Spinner";
 import Button from "@/components/Button";
+import { apiBaseUrl } from "@/constants";
 
 const PasswordResetConfirm: FC = () => {
   const [inputType, setInputType] = useState("password");
@@ -34,7 +35,7 @@ const PasswordResetConfirm: FC = () => {
     try {
       setLoading(true);
       await axios.post(
-        `http://localhost:8000/api/password-reset-confirm/${uidb64}/${token}/`,
+        `${apiBaseUrl}/api/password-reset-confirm/${uidb64}/${token}/`,
         {
           password,
         }

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 import Logo from "@/assets/open-sacco.png";
 import ForgotPasswordSvg from "@/assets/forgot-password.png";
+import { apiBaseUrl } from "@/constants";
 // components
 import FormInput from "@/components/FormInput";
 import Button from "@/components/Button";
@@ -18,7 +19,7 @@ const ForgotPassword: FC = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      await axios.post("http://localhost:8000/api/password-reset/", { email });
+      await axios.post(`${apiBaseUrl}/api/password-reset/`, { email });
       setLoading(false);
       toast.success(
         "Password reset email sent successfully. Please check your email",

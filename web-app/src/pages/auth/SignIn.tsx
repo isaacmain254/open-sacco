@@ -4,6 +4,7 @@ import axios from "axios";
 
 import LoginSvg from "@/assets/authenticate.svg";
 import Logo from "@/assets/open-sacco.png";
+import { apiBaseUrl } from "@/constants";
 // components
 import FormInput from "@/components/FormInput";
 import Button from "@/components/Button";
@@ -31,7 +32,7 @@ const SignIn: FC = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:8000/api/token/", {
+      const response = await axios.post(`${apiBaseUrl}/api/token/`, {
         username,
         password,
       });

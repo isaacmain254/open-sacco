@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 import LoginSvg from "@/assets/authenticate.svg";
 import Logo from "@/assets/open-sacco.png";
+import { apiBaseUrl } from "@/constants";
 // components
 import FormInput from "@/components/FormInput";
 import Button from "@/components/Button";
@@ -38,7 +39,7 @@ const SignUp: FC = () => {
     }
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:8000/api/register/", {
+      const response = await axios.post(`${apiBaseUrl}/api/register/`, {
         username,
         email,
         password,
