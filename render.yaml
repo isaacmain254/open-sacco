@@ -9,7 +9,11 @@ services:
     plan: free
     name: backend
     runtime: python3.9
-    buildCommand: "backend/build.sh"
+    buildCommand: |
+      # Install necessary build tools
+      apt-get update && apt-get install -y gcc libffi-dev
+      # Execute custom build script
+      ./backend/build.sh
     startCommand: "python -m gunicorn backend/backend.asgi:application -k uvicorn.workers.UvicornWorker"
     envVars:
       - key: DATABASE_URL
