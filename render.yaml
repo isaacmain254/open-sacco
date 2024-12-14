@@ -8,7 +8,7 @@ services:
   - type: web
     plan: free
     name: backend
-    runtime: python3.9
+    runtime: python
     buildCommand: |
       # Install necessary build tools
       apt-get update && apt-get install -y gcc libffi-dev
