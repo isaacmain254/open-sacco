@@ -13,8 +13,8 @@ services:
       # Install necessary build tools
       apt-get update && apt-get install -y gcc libffi-dev
       # Execute custom build script
-      backend/build.sh
-    startCommand: "python -m gunicorn backend/backend.asgi:application -k uvicorn.workers.UvicornWorker"
+      ./backend/build.sh
+    startCommand: "python -m gunicorn ./backend/backend.asgi:application -k uvicorn.workers.UvicornWorker"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
