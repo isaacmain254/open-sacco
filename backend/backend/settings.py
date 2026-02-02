@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # my apps
     'users.apps.UsersConfig',
     'customers.apps.CustomersConfig',
+    'members.apps.MembersConfig',
 
     # Third party apps
     'rest_framework',
