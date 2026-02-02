@@ -71,6 +71,11 @@ Update settings.py with your database credentials.
 Run migrations:
 
 ```bash
+python manage.py makemigrations
+```
+Then migrate to create the database:
+
+```bash
 python manage.py migrate
 ```
 Run the development server:
@@ -135,5 +140,6 @@ License
 This project is licensed under the MIT License.
 
 Contact
+
 
 For inquiries or support, reach out to isaacmain254.
