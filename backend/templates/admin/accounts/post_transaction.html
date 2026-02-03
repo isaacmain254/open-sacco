@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p>
+<strong>Account:</strong> {{ account.account_number }} <br>
+<strong>Member:</strong> {{ account.member }} <br>
+<strong>Current Balance:</strong> {{ account.balance }}
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <input type="submit" value="Post Transaction" class="default">
+  <a href="../change/">Cancel</a>
+</form>
+{% endblock %}
