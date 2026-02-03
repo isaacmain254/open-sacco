@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'customers.apps.CustomersConfig',
     'members.apps.MembersConfig',
     "accounts.apps.AccountsConfig",
+    "loans.apps.LoansConfig",
 
     # Third party apps
     'rest_framework',

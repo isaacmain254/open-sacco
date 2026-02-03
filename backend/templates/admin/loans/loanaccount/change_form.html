@@ -1,0 +1,35 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools %}
+<ul class="object-tools">
+  {{ block.super }}
+
+  {% if original.pk %}
+
+    {% if original.status == "pending" %}
+    <li>
+      <a href="{% url 'admin:loan_approve' original.pk %}" class="button default">
+        Approve Loan
+      </a>
+    </li>
+    {% endif %}
+
+    {% if original.status == "approved" %}
+    <li>
+      <a href="{% url 'admin:loan_disburse' original.pk %}" class="button default">
+        Disburse Loan
+      </a>
+    </li>
+    {% endif %}
+
+    {% if original.status == "disbursed" %}
+    <li>
+      <a href="{% url 'admin:loan_repay' original.pk %}" class="button">
+        Repay
+      </a>
+    </li>
+    {% endif %}
+
+  {% endif %}
+</ul>
+{% endblock %}
