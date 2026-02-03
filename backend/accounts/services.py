@@ -24,7 +24,7 @@ def post_savings_transaction(
         delta = -amount
     else:
         delta = amount
-cd code 
+
     with transaction.atomic():
         txn = SavingsTransaction.objects.create(
             account=account,
