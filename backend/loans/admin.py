@@ -3,12 +3,15 @@ from django.shortcuts import redirect
 from django.urls import path
 from django.contrib import messages
 from django.utils import timezone
+from django.template.response import TemplateResponse
 
 from .models import (
     LoanProduct,
     LoanAccount,
     LoanTransaction,
 )
+from .forms import LoanRepaymentForm
+
 
 
 @admin.register(LoanProduct)
@@ -29,6 +32,7 @@ class LoanTransactionInline(admin.TabularInline):
     model = LoanTransaction
     extra = 0
     readonly_fields = (
+        "narration",
         "transaction_type",
         "amount",
         "reference",
@@ -125,31 +129,61 @@ class LoanAccountAdmin(admin.ModelAdmin):
 
         messages.success(request, "Loan disbursed successfully.")
         return redirect("..")
-    
-    
+
     def repay_loan(self, request, loan_id):
         loan = LoanAccount.objects.get(id=loan_id)
 
         if loan.status != LoanAccount.DISBURSED:
-            messages.error(request, "Loan is not active.")
+            self.message_user(request, "Loan is not active.", level=messages.ERROR)
             return redirect("..")
 
-        repayment_amount = min(1000, loan.outstanding_principal)
+        if request.method == "POST":
+            form = LoanRepaymentForm(request.POST)
+            if form.is_valid():
+                amount = form.cleaned_data["amount"]
+                narration = form.cleaned_data["narration"]
 
-        LoanTransaction.objects.create(
+                if amount > loan.outstanding_principal:
+                    self.message_user(
+                        request,
+                        "Repayment amount exceeds outstanding balance.",
+                        level=messages.ERROR,
+                    )
+                    return redirect(request.path)
+
+                LoanTransaction.objects.create(
+                    loan=loan,
+                    transaction_type=LoanTransaction.REPAYMENT,
+                    amount=amount,
+                    reference=f"REPAY-{loan.loan_number}-{timezone.now().timestamp()}",
+                    narration=narration or "Loan repayment",
+                    performed_by=request.user,
+                )
+
+                loan.outstanding_principal -= amount
+                if loan.outstanding_principal <= 0:
+                    loan.status = LoanAccount.CLOSED
+
+                loan.save()
+
+                self.message_user(request, "Repayment posted successfully.")
+                return redirect(
+                    f"/admin/loans/loanaccount/{loan.id}/change/"
+                )
+
+        else:
+            form = LoanRepaymentForm()
+
+        context = dict(
+            self.admin_site.each_context(request),
+            form=form,
             loan=loan,
-            transaction_type=LoanTransaction.REPAYMENT,
-            amount=repayment_amount,
-            reference=f"REPAY-{loan.loan_number}-{timezone.now().timestamp()}",
-            performed_by=request.user,
-            narration="Loan repayment",
+            title="Post Loan Repayment",
         )
 
-        loan.outstanding_principal -= repayment_amount
-        if loan.outstanding_principal <= 0:
-            loan.status = LoanAccount.CLOSED
+        return TemplateResponse(
+            request,
+            "admin/loans/loanaccount/repay_form.html",
+            context,
+        )
 
-        loan.save()
-
-        messages.success(request, "Repayment posted.")
-        return redirect("..")

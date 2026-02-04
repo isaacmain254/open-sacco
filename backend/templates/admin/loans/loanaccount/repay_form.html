@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p>
+  <strong>Loan:</strong> {{ loan.loan_number }}<br />
+  <strong>Member:</strong> {{ loan.member }}<br />
+  <strong>Outstanding Balance:</strong> {{ loan.outstanding_principal }}
+</p>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <fieldset class="module aligned">
+    {{ form.as_p }}
+  </fieldset>
+
+  <div class="submit-row">
+    <input type="submit" value="Post Repayment" class="default" />
+    <a href="../" class="button cancel-link">Cancel</a>
+  </div>
+</form>
+{% endblock %}
