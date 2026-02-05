@@ -22,13 +22,13 @@
     </li>
     {% endif %}
 
-    {% if original.status == "disbursed" %}
-    <li>
-      <a href="{% url 'admin:loan_repay' original.pk %}" class="button">
-        Repay
-      </a>
-    </li>
-    {% endif %}
+   {% if original.status == "disbursed" %}
+  <li>
+    <a href="{% url 'admin:loan_repay' original.pk %}" class="button">
+      Repay
+    </a>
+  </li>
+{% endif %}
 
   {% endif %}
 </ul>
