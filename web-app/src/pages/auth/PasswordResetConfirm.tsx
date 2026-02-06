@@ -1,6 +1,5 @@
 import React, { FC, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
 
 import LoginSvg from "@/assets/authenticate.svg";
@@ -8,52 +7,40 @@ import Logo from "@/assets/open-sacco.png";
 import FormInput from "@/components/FormInput";
 import Spinner from "@/components/Spinner";
 import Button from "@/components/Button";
-import { apiBaseUrl } from "@/constants";
+// hooks
+import { usePasswordReset } from "@/hooks/api/auth";
 
 const PasswordResetConfirm: FC = () => {
-  const [inputType, setInputType] = useState("password");
-  const [inputIcon, setInputIcon] = useState("EyeOff");
-  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { uidb64, token } = useParams<{ uidb64: string; token: string }>();
-
-  // handle password visibility
-  const handleIconClick = () => {
-    setInputType((prev) => (prev === "password" ? "text" : "password"));
-    setInputIcon((prev) => (prev === "EyeOff" ? "Eye" : "EyeOff"));
-  };
+  const searchParams = new URLSearchParams(window.location.search);
+  console.log("Search params:", searchParams.toString());
+  const uid = searchParams.get("user") || "";
+  const token = searchParams.get("token") || "";
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const {mutate: passwordReset, isPending: isPasswordResetPending} = usePasswordReset()
+
+  const handleSubmit =  (event: React.FormEvent) => {
     event.preventDefault();
     if (password !== confirmPassword) {
       toast.error("Passwords do not match", { autoClose: 3000 });
       return;
     }
-    try {
-      setLoading(true);
-      await axios.post(
-        `${apiBaseUrl}/api/password-reset-confirm/${uidb64}/${token}/`,
-        {
-          password,
-        }
-      );
-      setLoading(false);
-      toast.success("Password reset successful", { autoClose: 2000 });
-      // redirect to login page
-      navigate("/login");
-    } catch (error) {
-      setLoading(false);
-      toast.error(
-        "Error resetting password. Please request for a new reset link",
-        {
-          autoClose: 5000,
-        }
-      );
-    }
-  };
+    passwordReset(
+      { uid, token, password },
+      {
+        onSuccess: (data) => {
+          toast.success(data.message, { autoClose: 2000 });
+          navigate("/login");
+        },
+        onError: (error) => {
+          toast.error("Error resetting password", { autoClose: 2000 });
+        },
+      },
+    );
+  }
 
   return (
     <div className="w-full h-screen  flex  text-slate-700 dark:bg-blue-900 dark:text-slate-300">
@@ -75,27 +62,23 @@ const PasswordResetConfirm: FC = () => {
           </div>
           <form className="w-72 space-y-4" onSubmit={handleSubmit}>
             <FormInput
-              type={inputType}
+              type="password"
               name="password"
               placeholder="Password"
               value={password}
               label="Password"
-              icon={inputIcon}
-              onIconClick={handleIconClick}
               onChange={(e) => setPassword(e.target.value)}
             />
             <FormInput
-              type={inputType}
+              type="password"
               name="confirmPassword"
               placeholder="Confirm Password"
               value={confirmPassword}
               label="ConfirmPassword"
-              icon={inputIcon}
-              onIconClick={handleIconClick}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <Button
-              text={loading ? <Spinner /> : "Sign Up"}
+              text={isPasswordResetPending ? <Spinner /> : "Sign Up"}
               type="submit"
               variant="secondary"
               className="my-5 w-full"

@@ -84,7 +84,9 @@ class LogoutView(APIView):
 
     def get(self, request):
         logout(request)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {"message": "Logged out successfully"},
+            status=status.HTTP_204_NO_CONTENT)
 
 
 class PasswordResetRequestView(generics.GenericAPIView):
@@ -156,7 +158,7 @@ class PasswordResetView(generics.GenericAPIView):
 
         if not user or not default_token_generator.check_token(user, token):
             return Response(
-                {"detail": "Invalid or expired token"},
+                {"message": "Invalid or expired token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -164,7 +166,7 @@ class PasswordResetView(generics.GenericAPIView):
         user.save()
 
         return Response(
-            {"detail": "Password reset successful"},
+            {"message": "Password reset successful"},
             status=status.HTTP_204_NO_CONTENT
         )
 

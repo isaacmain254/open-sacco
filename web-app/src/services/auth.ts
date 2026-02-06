@@ -17,15 +17,28 @@ export interface LoginPayload {
   email: string;
   password: string;
 }
-
-export interface GenericResponse {
-  message: string;
-  success: boolean;
+export interface RefreshTokenPayload {
+  refresh: string;
 }
 
-export interface LoginResponse {
+export interface RequestPasswordResetPayload {
+  email: string;
+}
+
+export interface PasswordResetPayload {
+  token: string;
+  uid: string;
+  password: string;
+}
+
+export interface GenericResponse {
+  message?: string;
+  success?: boolean;
+}
+
+export interface AuthResponse {
   access: string;
-  refresh: string;
+  refresh?: string;
 }
 
 export const authService = {
@@ -33,5 +46,16 @@ export const authService = {
     api.post("/auth/register", data) as Promise<RegisterResponse>,
 
   login: (data: LoginPayload) =>
-    api.post("/auth/login", data) as Promise<LoginResponse>,
+    api.post("/auth/login", data) as Promise<AuthResponse>,
+
+  logout: () => api.get("/auth/logout") as Promise<GenericResponse>,
+
+  refreshToken: (data: RefreshTokenPayload) =>
+    api.post("/auth/refresh-token", data) as Promise<AuthResponse>,
+
+  requestPasswordReset: (data: RequestPasswordResetPayload) =>
+    api.post("/auth/request-password-reset", data) as Promise<GenericResponse>,
+
+  passwordReset: (data: PasswordResetPayload) =>
+    api.post("/auth/password-reset", data) as Promise<GenericResponse>,
 };
