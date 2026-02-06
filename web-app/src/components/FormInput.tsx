@@ -1,11 +1,9 @@
 import React, { ChangeEvent } from "react";
-// components
 import LucideIcon from "./LucideIcon";
 
 type Props = {
   name?: string;
   type: string;
-  icon?: string;
   placeholder?: string;
   value?: string | number;
   label?: string;
@@ -14,13 +12,11 @@ type Props = {
   accept?: string;
   ref?: React.RefObject<HTMLInputElement>;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
-  onIconClick?: () => void;
 };
 
 const FormInput: React.FC<Props> = ({
   name,
   type,
-  icon,
   placeholder,
   value,
   className,
@@ -28,19 +24,29 @@ const FormInput: React.FC<Props> = ({
   accept,
   disabled,
   onChange,
-  onIconClick,
   ref,
 }) => {
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const inputType =
+    type === "password" ? (showPassword ? "text" : "password") : type;
+
   return (
-    <div className="relative flex items-center">
-      <label htmlFor={name}>
-        {label}
+    <div className="w-full">
+      {label && (
+        <label htmlFor={name} className="block mb-1">
+          {label}
+        </label>
+      )}
+
+      <div className="relative">
         <input
-          className={` border border-gray-300  rounded-md px-4 py-2  outline-none  dark:bg-blue-900 dark:text-white dark:border-slate-500 ${
-            disabled ? "cursor-not-allowed" : ""
-          } ${className}`}
+          className={`border border-gray-300 rounded-md px-4 pr-10 py-2 outline-none w-full
+            dark:bg-blue-900 dark:text-white dark:border-slate-500
+            ${disabled ? "cursor-not-allowed" : ""}
+            ${className}`}
           name={name}
-          type={type}
+          type={inputType}
           placeholder={placeholder}
           value={value}
           accept={accept}
@@ -50,13 +56,21 @@ const FormInput: React.FC<Props> = ({
           disabled={disabled}
           ref={ref}
         />
-        <i
-          onClick={onIconClick}
-          className="absolute  right-3 bottom-3 cursor-pointer"
-        >
-          {icon && <LucideIcon name={icon} size={20} />}
-        </i>
-      </label>
+
+        {type === "password" && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            {showPassword ? (
+              <LucideIcon name="Eye" size={20} />
+            ) : (
+              <LucideIcon name="EyeOff" size={20} />
+            )}
+          </button>
+        )}
+      </div>
     </div>
   );
 };

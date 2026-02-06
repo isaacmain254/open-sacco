@@ -10,11 +10,12 @@ import { apiBaseUrl } from "@/constants";
 import FormInput from "@/components/FormInput";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
+import { useRegister } from "@/hooks/api/auth";
 
 const SignUp: FC = () => {
   // TODO: manage input type and icon state independently and validate form input
-  const [inputType, setInputType] = useState("password");
-  const [inputIcon, setInputIcon] = useState("EyeOff");
+  // const [inputType, setInputType] = useState("password");
+  // const [inputIcon, setInputIcon] = useState("EyeOff");
   const [loading, setLoading] = useState(false);
 
   const [username, setUsername] = useState("");
@@ -23,41 +24,32 @@ const SignUp: FC = () => {
   const [password2, setPassword2] = useState("");
 
   const navigate = useNavigate();
-  // handle password visibility
-  const handleIconClick = () => {
-    setInputType((prev) => (prev === "password" ? "text" : "password"));
-    setInputIcon((prev) => (prev === "EyeOff" ? "Eye" : "EyeOff"));
-  };
+ const { mutate: register, isPending: isRegisterPending } = useRegister();
+ 
 
-  // handle signup
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    // Validate password and confirm password fields
     if (password !== password2) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match", { autoClose: 2000 });
       return;
     }
-    try {
-      setLoading(true);
-      const response = await axios.post(`${apiBaseUrl}/api/register/`, {
-        username,
-        email,
-        password,
-        password2,
-      });
-
-      // Store the token in local storage
-      localStorage.setItem("access_token", response.data.tokens.access);
-      localStorage.setItem("refresh_token", response.data.tokens.refresh);
-      setLoading(false);
-      toast.success("Account created successfully", { autoClose: 2000 });
-      // Redirect to the dashboard
-      navigate("/");
-    } catch (error) {
-      setLoading(false);
-      toast.error("Error creating account", { autoClose: 2000 });
-    }
+    setLoading(true);
+   register(
+      { username, email, password, confirm_password: password2 },
+      {
+        onSuccess: (data) => {
+          setLoading(false);
+          toast.success("Account created successfully", { autoClose: 2000 });
+          navigate("/login");
+        },
+        onError: (error) => {
+          setLoading(false);
+          toast.error("Error creating account", { autoClose: 2000 });
+        },
+      },
+      )
   };
+  
   return (
     <div className="w-full h-screen  flex  text-slate-700  dark:bg-blue-900 dark:text-slate-300">
       <div className="lg:w-1/2 rounded-e-full flex flex-col justify-center items-center bg-slate-200 text-center max-md:hidden  dark:bg-blue-950 dark:text-slate-300">
@@ -96,23 +88,19 @@ const SignUp: FC = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
             <FormInput
-              type={inputType}
+              type="password"
               name="password"
               placeholder="Password"
               value={password}
               label="Password"
-              icon={inputIcon}
-              onIconClick={handleIconClick}
               onChange={(e) => setPassword(e.target.value)}
             />
             <FormInput
-              type={inputType}
+              type="password"
               name="confirmPassword"
               placeholder="Confirm Password"
               value={password2}
               label="ConfirmPassword"
-              icon={inputIcon}
-              onIconClick={handleIconClick}
               onChange={(e) => setPassword2(e.target.value)}
             />
             <Button

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
 // pages
@@ -54,27 +55,27 @@ const router = createBrowserRouter([
       },
       {
         path: "/customers/view/:customerId",
-        element: <CustomersView />
+        element: <CustomersView />,
       },
       {
         path: "/accounts",
         element: <Accounts />,
       },
       {
-        path: '/accounts/edit/:accountNo?',
-        element: <AccountsEdit />
+        path: "/accounts/edit/:accountNo?",
+        element: <AccountsEdit />,
       },
       {
-        path: '/accounts/view/:accountNo',
-        element: <AccountsView />
+        path: "/accounts/view/:accountNo",
+        element: <AccountsView />,
       },
       {
         path: "/transactions",
         element: <Transactions />,
       },
       {
-        path: '/transactions/edit/:transactionId?',
-        element: <TransactionsEdit />
+        path: "/transactions/edit/:transactionId?",
+        element: <TransactionsEdit />,
       },
       {
         path: "/loans",
@@ -86,7 +87,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/loans/view/:loanId",
-        element: <LoansView />
+        element: <LoansView />,
       },
       {
         path: "/settings",
@@ -94,7 +95,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/help",
-        element: <Help />
+        element: <Help />,
       },
       {
         path: "/users",
@@ -124,11 +125,16 @@ const router = createBrowserRouter([
   },
 ]);
 
+// Create a client
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeContextProvider>
-      <RouterProvider router={router} />
-      <ToastContainer />
-    </ThemeContextProvider>
-  </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <ThemeContextProvider>
+        <RouterProvider router={router} />
+        <ToastContainer />
+      </ThemeContextProvider>
+    </QueryClientProvider>
+  </React.StrictMode>,
 );
