@@ -89,7 +89,7 @@ class LogoutView(APIView):
 
 class PasswordResetRequestView(generics.GenericAPIView):
     """
-    Request password reset for a user
+    Request password reset for a user. Send an email with a reset link containing a token and uid. \n
     Fields:
         - email
     """
@@ -110,10 +110,12 @@ class PasswordResetRequestView(generics.GenericAPIView):
 
         # Generate token and uid
         token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk)) 
-        print("uid", user)
+        # uid = urlsafe_base64_encode(force_bytes(user.pk))
+        uid = user.pk
+        print("uid", user.pk)
 
-        reset_url = f"http://localhost:3000/reset-password/{uid}/{token}/"
+        reset_url = f"http://localhost:3000/reset-password/?user={uid}&token={token}"
+        print("reset_url", reset_url)
 
         send_mail(
             subject="Password reset",
@@ -128,9 +130,15 @@ class PasswordResetRequestView(generics.GenericAPIView):
         )
 
 
-
 # # TODO: Add SERIALIZER CLASS
 class PasswordResetView(generics.GenericAPIView):
+    """
+    Password reset view to handle password reset requests. Validate the token and uid, and set the new password. \n
+    Fields: 
+    - uid
+    - token
+    - password
+    """
     serializer_class = PasswordResetSerializer
     permission_classes = (AllowAny,)
 
@@ -138,8 +146,9 @@ class PasswordResetView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        uid = force_str(urlsafe_base64_decode(
-            serializer.validated_data["uid"]))
+        # uid = force_str(urlsafe_base64_decode(
+        #     serializer.validated_data["uid"]))
+        uid = serializer.validated_data["uid"]
         token = serializer.validated_data["token"]
         password = serializer.validated_data["password"]
 
