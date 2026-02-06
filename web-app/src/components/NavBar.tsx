@@ -1,16 +1,15 @@
-import { FC, useContext, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 
 import ProfilePlaceholder from "@/assets/profile-placeholder.png";
 import Logo from "@/assets/open-sacco.png";
 // components
 import LucideIcon from "./LucideIcon";
 // context and custom hook
-import { ThemeContext } from "@/contexts/ThemeContext";
+import { Theme } from "@/contexts/ThemeContext";
+
 import { useUserProfileInfo } from "@/hooks/useUserProfile";
 // constants
-import { apiBaseUrl } from "@/constants";
 import { useLogout } from "@/hooks/api/auth";
 
 interface NavBarProps {
@@ -24,7 +23,7 @@ const NavBar: FC<NavBarProps> = ({
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   // dark mode context consumer
-  const { toggleDarkTheme, darkTheme } = useContext(ThemeContext);
+  const { toggleDarkTheme, darkTheme } = Theme();
 
   // custom hook for user profile
   const { profile } = useUserProfileInfo();
@@ -54,7 +53,7 @@ const NavBar: FC<NavBarProps> = ({
 
   const navigate = useNavigate();
 
-  const { mutate: logout, isPendingLogout } = useLogout();
+  const { mutate: logout, isPending: isPendingLogout } = useLogout();
 
   // handle logout
   // const handleLogout = async () => {
@@ -76,7 +75,10 @@ const NavBar: FC<NavBarProps> = ({
     <div className="max-w-full relative flex items-center justify-between text-white bg-blue-700 h-16 dark:bg-blue-800 dark:text-slate-300 rounded-lg px-3 ">
       <div className="flex items-center">
         <img src={Logo} alt="Open SACCO logo" className="w-20 h-20" />
-        <div className="lg:hidden" onClick={handleMobileMenuToggle}>
+        <div
+          className="lg:hidden cursor-pointer"
+          onClick={handleMobileMenuToggle}
+        >
           {showMobileMenu ? (
             <LucideIcon name="X" size={27} />
           ) : (
@@ -86,7 +88,7 @@ const NavBar: FC<NavBarProps> = ({
       </div>
 
       <div className="flex gap-x-5 items-center">
-        <div onClick={toggleDarkTheme}>
+        <div className="cursor-pointer" onClick={toggleDarkTheme}>
           {darkTheme ? (
             <LucideIcon name="Moon" size={24} />
           ) : (

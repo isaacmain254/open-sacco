@@ -13,9 +13,9 @@ export const useRegister = () => {
     mutationFn: (data: RegisterPayload) => authService.register(data),
     onSuccess: (data) => {
       // Handle successful Register
-      if (data) {
-        localStorage.setItem("accessToken", data.accessToken);
-      }
+      // if (data) {
+      //   localStorage.setItem("accessToken", data.accessToken);
+      // }
     },
   });
 };
@@ -25,10 +25,11 @@ export const useLogin = () => {
     mutationFn: (data: LoginPayload) => authService.login(data),
     onSuccess: (data) => {
       // Handle successful Login
-      if (data) {
+      // if (data) {
         localStorage.setItem("accessToken", data.access);
         localStorage.setItem("refreshToken", data.refresh || "");
-      }
+      // }
+      console.log("Login successful", data);
     },
   });
 };

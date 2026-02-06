@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import LoginSvg from "@/assets/authenticate.svg";
 import Logo from "@/assets/open-sacco.png";
@@ -10,6 +10,7 @@ import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
 import { toast } from "react-toastify";
 import { useLogin } from "@/hooks/api/auth";
+import { Auth } from "@/contexts/AuthContext";
 
 // interface LoginFormData{
 //   email: string;
@@ -20,20 +21,19 @@ const SignIn: FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate();
-  const { mutate: login, isPending: isRegisterPending } = useLogin();
+  const { mutate: userLogin, isPending: isRegisterPending } = useLogin();
+  const { login } = Auth();
 
   // handle login
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-    login(
+    userLogin(
       { email, password },
       {
         onSuccess: (data) => {
+          login(data);
           toast.success("Login successful", { autoClose: 2000 });
-          // Redirect to dashboard after login
-          navigate("/");
         },
         onError: (error) => {
           toast.error("Error logging in", { autoClose: 2000 });
