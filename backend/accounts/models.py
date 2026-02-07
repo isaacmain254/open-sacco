@@ -70,7 +70,7 @@ class SavingsAccount(models.Model):
 
     def __str__(self):
         return f"{self.account_number} - {self.member}"
-    
+
 
 class SavingsTransaction(models.Model):
     DEPOSIT = "deposit"
@@ -110,7 +110,7 @@ class SavingsTransaction(models.Model):
     narration = models.TextField(blank=True)
 
     performed_by = models.ForeignKey(
-        "auth.User",
+        "users.User",
         on_delete=models.PROTECT
     )
 

@@ -1,39 +1,44 @@
 import React, { FC, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import Spinner from "@/components/Spinner";
 import { toast } from "react-toastify";
 
 import Logo from "@/assets/open-sacco.png";
 import ForgotPasswordSvg from "@/assets/forgot-password.png";
-import { apiBaseUrl } from "@/constants";
+
 // components
 import FormInput from "@/components/FormInput";
 import Button from "@/components/Button";
 
+// Hooks
+import { useRequestPasswordReset } from "@/hooks/api/auth";
+
 const ForgotPassword: FC = () => {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  const {
+    mutate: requestPasswordReset,
+    isPending: isRequestPasswordResetPending,
+  } = useRequestPasswordReset();
+
+  const handleEmailSubmit =  (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      setLoading(true);
-      await axios.post(`${apiBaseUrl}/api/password-reset/`, { email });
-      setLoading(false);
-      toast.success(
-        "Password reset email sent successfully. Please check your email",
-        {
-          autoClose: 4000,
-        }
-      );
-    } catch (error) {
-      setLoading(false);
-      toast.error("Error sending password reset email. Enter valid email", {
-        autoClose: 3000,
-      });
-    }
+    requestPasswordReset(
+      { email },
+      {
+        onSuccess: (data) => {
+          toast.success(data.message, { autoClose: 2000 });
+          setEmail("");
+        },
+        onError: (error) => {
+          toast.error("Error sending password reset email", {
+            autoClose: 2000,
+          });
+        },
+      },
+    );
   };
+
   return (
     <div className="w-full h-screen  flex  text-slate-700 dark:bg-blue-900 dark:text-slate-300">
       <div className="lg:w-1/2 h-full rounded-e-full  flex flex-col justify-center items-center bg-gray-200 max-md:hidden  dark:bg-blue-950 dark:text-slate-300">
@@ -62,7 +67,7 @@ const ForgotPassword: FC = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
             <Button
-              text={loading ? <Spinner /> : "Send Email"}
+              text={isRequestPasswordResetPending ? <Spinner /> : "Send Email"}
               type="submit"
               variant="secondary"
               className="my-5 w-full"

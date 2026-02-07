@@ -1,16 +1,16 @@
-import { FC, useContext, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 
 import ProfilePlaceholder from "@/assets/profile-placeholder.png";
 import Logo from "@/assets/open-sacco.png";
 // components
 import LucideIcon from "./LucideIcon";
 // context and custom hook
-import { ThemeContext } from "@/contexts/ThemeContext";
+import { Theme } from "@/contexts/ThemeContext";
+
 import { useUserProfileInfo } from "@/hooks/useUserProfile";
 // constants
-import { apiBaseUrl } from "@/constants";
+import { useLogout } from "@/hooks/api/auth";
 
 interface NavBarProps {
   showMobileMenu: boolean;
@@ -23,10 +23,10 @@ const NavBar: FC<NavBarProps> = ({
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   // dark mode context consumer
-  const { toggleDarkTheme, darkTheme } = useContext(ThemeContext);
+  const { toggleDarkTheme, darkTheme } = Theme();
 
   // custom hook for user profile
-  const {profile } = useUserProfileInfo();
+  const { profile } = useUserProfileInfo();
 
   const handleShowDropdown = () => {
     setShowDropdown(!showDropdown);
@@ -36,7 +36,10 @@ const NavBar: FC<NavBarProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current?.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current?.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     }
@@ -50,23 +53,32 @@ const NavBar: FC<NavBarProps> = ({
 
   const navigate = useNavigate();
 
+  const { mutate: logout, isPending: isPendingLogout } = useLogout();
+
   // handle logout
-  const handleLogout = async () => {
-    try {
-      await axios.get(`${apiBaseUrl}/api/logout/`);
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      // TODO: Confirm dialog before logout and redirect to login page - modal with different sizes
-      navigate("/login");
-    } catch {
-      console.log("error");
-    }
+  // const handleLogout = async () => {
+  //   try {
+  //     await axios.get(`${apiBaseUrl}/api/logout/`);
+  //     localStorage.removeItem("access_token");
+  //     localStorage.removeItem("refresh_token");
+  //     // TODO: Confirm dialog before logout and redirect to login page - modal with different sizes
+  //     navigate("/login");
+  //   } catch {
+  //     console.log("error");
+  //   }
+  // };
+
+  const handleLogout = () => {
+    logout();
   };
   return (
     <div className="max-w-full relative flex items-center justify-between text-white bg-blue-700 h-16 dark:bg-blue-800 dark:text-slate-300 rounded-lg px-3 ">
       <div className="flex items-center">
         <img src={Logo} alt="Open SACCO logo" className="w-20 h-20" />
-        <div className="lg:hidden" onClick={handleMobileMenuToggle}>
+        <div
+          className="lg:hidden cursor-pointer"
+          onClick={handleMobileMenuToggle}
+        >
           {showMobileMenu ? (
             <LucideIcon name="X" size={27} />
           ) : (
@@ -76,7 +88,7 @@ const NavBar: FC<NavBarProps> = ({
       </div>
 
       <div className="flex gap-x-5 items-center">
-        <div onClick={toggleDarkTheme}>
+        <div className="cursor-pointer" onClick={toggleDarkTheme}>
           {darkTheme ? (
             <LucideIcon name="Moon" size={24} />
           ) : (
@@ -84,13 +96,13 @@ const NavBar: FC<NavBarProps> = ({
           )}
         </div>
         <div>
-          <img
+          {/* <img
             className="rounded-full  border border-white w-10 h-10"
             src={ profile?.profile.profile_image ? `${apiBaseUrl}${profile?.profile.profile_image}` : ProfilePlaceholder}
             // src={ProfileImage}
             alt=" mr Isaac"
             onClick={handleShowDropdown}
-          />
+          /> */}
           {/* dropdown menu start here */}
           <div
             ref={dropdownRef}
@@ -102,7 +114,7 @@ const NavBar: FC<NavBarProps> = ({
               <p className="">
                 {profile?.username}
                 <small className="bg-blue-700 dark:bg-blue-950 rounded-md text-white text-xs p-0.5">
-                  {profile?.profile.role_display}
+                  {/* {profile?.profile.role_display} */}
                 </small>
               </p>
               <p className="pb-2">{profile?.email}</p>

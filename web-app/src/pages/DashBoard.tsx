@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useDashboardData } from "@/hooks/useDashboardData";
+// import { useDashboardData } from "@/hooks/useDashboardData";
 import { useDataFetch } from "@/hooks/useDataFetch";
 import {
   Activity,
@@ -30,10 +30,10 @@ import { Badge } from "@/components/ui/badge";
 import { LoanProps, TransactionProps } from "@/types";
 
 const DashBoard = () => {
-  const { totalCustomers, totalAccountBalance, totalLoans, totalWithdrawals } =
-    useDashboardData();
-  const { data: transactions } = useDataFetch<TransactionProps>("transactions");
-  const { data: loans } = useDataFetch<LoanProps>("loans");
+  // const { totalCustomers, totalAccountBalance, totalLoans, totalWithdrawals } =
+  //   useDashboardData();
+  // const { data: transactions } = useDataFetch<TransactionProps>("transactions");
+  // const { data: loans } = useDataFetch<LoanProps>("loans");
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
@@ -43,7 +43,7 @@ const DashBoard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCustomers}</div>
+            {/* <div className="text-2xl font-bold">{totalCustomers}</div> */}
             <p className="text-xs text-muted-foreground">
               +180.1% from last month
             </p>
@@ -57,7 +57,7 @@ const DashBoard = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalAccountBalance}</div>
+            {/* <div className="text-2xl font-bold">${totalAccountBalance}</div> */}
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
             </p>
@@ -71,7 +71,7 @@ const DashBoard = () => {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalWithdrawals}</div>
+            {/* <div className="text-2xl font-bold">${totalWithdrawals}</div> */}
             <p className="text-xs text-muted-foreground">
               +19% from last month
             </p>
@@ -83,7 +83,7 @@ const DashBoard = () => {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$ {totalLoans}</div>
+            {/* <div className="text-2xl font-bold">$ {totalLoans}</div> */}
             <p className="text-xs text-muted-foreground">
               +201 since last hour
             </p>
@@ -115,14 +115,14 @@ const DashBoard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.slice(0, 10).map((transaction) => (
+                {/* {transactions.slice(0, 10).map((transaction) => (
                   <TableRow key={transaction.transaction_id}>
                     <TableCell>{transaction.account}</TableCell>
                     <TableCell>{transaction.transaction_type}</TableCell>
                     <TableCell className="">${transaction.amount}</TableCell>
                     <TableCell>{transaction.transaction_date.toString()}</TableCell>
                   </TableRow>
-                ))}
+                ))} */}
               </TableBody>
             </Table>
           </CardContent>
@@ -137,7 +137,7 @@ const DashBoard = () => {
               <div>Status</div>
               <div>Amount</div>
             </div>
-            {loans.slice(0, 10).map((loan) => (
+            {/* {loans.slice(0, 10).map((loan) => (
               <div key={loan.loan_id} className="flex justify-between gap-4">
                 <div>{loan.account}</div>
                 <div>
@@ -147,7 +147,7 @@ const DashBoard = () => {
                 </div>
                 <div className="font-medium">{loan.amount}</div>
               </div>
-            ))}
+            ))} */}
           </CardContent>
         </Card>
       </div>

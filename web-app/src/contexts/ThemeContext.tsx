@@ -1,4 +1,10 @@
-import { createContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useContext,
+} from "react";
 
 export interface ThemeProps {
   children: ReactNode;
@@ -33,4 +39,9 @@ export const ThemeContextProvider = ({ children }: ThemeProps) => {
       {children}
     </ThemeContext.Provider>
   );
+};
+
+export const Theme = () => {
+  const context = useContext(ThemeContext);
+  return context;
 };

@@ -1,134 +1,22 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
-// pages
-import App from "./App.tsx";
-import ErrorPage from "./pages/ErrorPage.tsx";
-import DashBoard from "./pages/DashBoard.tsx";
-// authentication
-import SignIn from "./pages/auth/SignIn.tsx";
-import SignUp from "./pages/auth/SignUp.tsx";
-import ForgotPassword from "./pages/auth/ForgotPassword.tsx";
-import PasswordResetConfirm from "./pages/auth/PasswordResetConfirm.tsx";
-// customers
-import Customers from "./pages/customers/Customers.tsx";
-import CustomersEdit from "./pages/customers/CustomersEdit.tsx";
-import CustomersView from "./pages/customers/CustomersView.tsx";
-// accounts
-import Accounts from "./pages/accounts/Accounts.tsx";
-import AccountsEdit from "./pages/accounts/AccoutsEdit.tsx";
-import AccountsView from "./pages/accounts/AccountsView.tsx";
-// Transactions
-import Transactions from "./pages/transactions/Transactions.tsx";
-import TransactionsEdit from "./pages/transactions/TransactionsEdit.tsx";
-import Settings from "./pages/Settings.tsx";
-import Loans from "./pages/loans/Loans.tsx";
-import Users from "./pages/Users.tsx";
-import Profile from "./pages/Profile.tsx";
-import { ThemeContextProvider } from "./contexts/ThemeContext.tsx";
-import LoansEdit from "./pages/loans/LoansEdit.tsx";
-import LoansView from "./pages/loans/LoansView.tsx";
-import Help from "./pages/Help.tsx";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: "/",
-        element: <DashBoard />,
-      },
-      {
-        path: "/customers",
-        element: <Customers />,
-      },
-      {
-        path: "/customers/edit/:customerId?",
-        element: <CustomersEdit />,
-      },
-      {
-        path: "/customers/view/:customerId",
-        element: <CustomersView />
-      },
-      {
-        path: "/accounts",
-        element: <Accounts />,
-      },
-      {
-        path: '/accounts/edit/:accountNo?',
-        element: <AccountsEdit />
-      },
-      {
-        path: '/accounts/view/:accountNo',
-        element: <AccountsView />
-      },
-      {
-        path: "/transactions",
-        element: <Transactions />,
-      },
-      {
-        path: '/transactions/edit/:transactionId?',
-        element: <TransactionsEdit />
-      },
-      {
-        path: "/loans",
-        element: <Loans />,
-      },
-      {
-        path: "/loans/edit/:loanId?",
-        element: <LoansEdit />,
-      },
-      {
-        path: "/loans/view/:loanId",
-        element: <LoansView />
-      },
-      {
-        path: "/settings",
-        element: <Settings />,
-      },
-      {
-        path: "/help",
-        element: <Help />
-      },
-      {
-        path: "/users",
-        element: <Users />,
-      },
-      {
-        path: "/profile",
-        element: <Profile />,
-      },
-    ],
-  },
-  {
-    path: "/login",
-    element: <SignIn />,
-  },
-  {
-    path: "/register",
-    element: <SignUp />,
-  },
-  {
-    path: "/forgot-password",
-    element: <ForgotPassword />,
-  },
-  {
-    path: "/reset-password/:uidb64/:token",
-    element: <PasswordResetConfirm />,
-  },
-]);
+import { router } from "./routes/index.tsx";
+
+// Create a query client
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeContextProvider>
+    <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       <ToastContainer />
-    </ThemeContextProvider>
-  </React.StrictMode>
+    </QueryClientProvider>
+  </React.StrictMode>,
 );
