@@ -1,7 +1,6 @@
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from drf_writable_nested.mixins import UniqueFieldsMixin
 
 from .models import Member, NextOfKin, EmploymentDetail, KYCDocument
 
@@ -9,34 +8,38 @@ from .models import Member, NextOfKin, EmploymentDetail, KYCDocument
 class NextOfKinSerializer(serializers.ModelSerializer):
     class Meta:
         model = NextOfKin
-        exclude = ("member",)
+        exclude = ("member", "created_at")
 
 
 class EmploymentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmploymentDetail
-        fields = '__all__'
+        exclude = ("member", "created_at")
 
 
 class KYCDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = KYCDocument
-        fields = '__all__'
+        exclude = ("member", "uploaded_at")
 
 
-# class MemberSerializer(serializers.ModelSerializer):
-#     next_of_kin = NextOfKinSerializer(many=True, read_only=True)
-#     employment = EmploymentDetailSerializer(read_only=True)
-#     kyc_documents = KYCDocumentSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Member
-#         fields = '__all__'
-
-#FIXME: Update throws an error because national_id field is unique
 class MemberSerializer(WritableNestedModelSerializer):
     next_of_kin = NextOfKinSerializer(many=True)
+    employment = EmploymentDetailSerializer(many=False)
+    kyc_documents = KYCDocumentSerializer(many=True)
 
     class Meta:
         model = Member
         exclude = ("date_joined", "created_at", "updated_at")
+        # Fix  UniqueValidator error on national_id field on instance update
+        # Allow DRF to handle it automatically
+        extra_kwargs = {
+            'national_id': {
+                'validators': [
+                    UniqueValidator(
+                        queryset=Member.objects.all(),
+                        message="A member with this national ID already exists."
+                    )
+                ]
+            }
+        }
