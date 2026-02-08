@@ -17,7 +17,7 @@ const Button: FC<ButtonProps> = ({
   variant,
 }) => {
   const bg =
-    variant === "primary" ? "bg- white text-black" : "bg-blue-500 text-white";
+    variant === "primary" ? "bg- white text-black hover:border-blue-500" : "bg-blue-500 text-white hover:bg-blue-600";
   return (
     <button
       className={`flex justify-center py-2 px-3 rounded-md ${bg} ${className}`}

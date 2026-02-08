@@ -61,7 +61,7 @@ const FormInput: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-800"
           >
             {showPassword ? (
               <LucideIcon name="Eye" size={20} />

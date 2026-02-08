@@ -67,8 +67,8 @@ export const useLogout = () => {
 export const useRefreshToken = () => {
   return useMutation({
     mutationFn: (data: RefreshTokenPayload) => authService.refreshToken(data),
-    onSuccess: (data) => {
-      localStorage.setItem("refreshToken", data.refresh || "");
+    onSuccess: () => {
+      // localStorage.setItem("refreshToken", data.refresh || "");
     },
   });
 };
