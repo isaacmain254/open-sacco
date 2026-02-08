@@ -3,6 +3,8 @@ from rest_framework import routers
 
 from .views import CustomerViewSet, AccountViewSet, TransactionViewSet, LoanViewSet
 
+app_name = 'customers'
+
 router = routers.DefaultRouter()
 router.register(r'customers', CustomerViewSet)
 router.register(r'accounts', AccountViewSet)

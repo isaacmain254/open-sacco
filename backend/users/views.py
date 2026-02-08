@@ -1,6 +1,7 @@
 # from django.shortcuts import render
 # from django.contrib.auth.models import User
-from .models import User  # or get_user_model()
+# from .models import User  # or get_user_model()
+from django.contrib.auth import get_user_model
 from .serializers import PasswordResetTRequestSerializer
 from rest_framework import generics, status
 from django.utils.encoding import force_bytes
@@ -18,17 +19,19 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 # from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.permissions import IsAuthenticated
 
-from .serializers import RegisterSerializer, PasswordResetTRequestSerializer, PasswordResetSerializer
+from .serializers import RegisterSerializer, PasswordResetTRequestSerializer, PasswordResetSerializer, UserSerializer
 
 # from .serializers import PasswordResetConfirmSerializer, UserSerializer, RegisterSerializer, PasswordResetSerializer, ProfileSerializer
 # from .models import Profile
 
 User = get_user_model()
 
-# class UserViewList(viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
+class UserViewList(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
 
 # class UserProfileView(APIView):
