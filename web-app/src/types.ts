@@ -19,7 +19,7 @@ export type UserProps = {
   profile: Profile;
 };
 
-export type CustomerProps = {
+type CustomerProps = {
   id: number;
   salutation: string;
   first_name: string;

@@ -38,7 +38,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import Spinner from "@/components/Spinner";
 // types
-import { CustomerProps } from "@/types";
+// import { CustomerProps } from "@/types";
 import { toast } from "react-toastify";
 
 // form validation
@@ -55,7 +55,7 @@ const formSchema = z.object({
   last_name: z.string().min(2, {
     message: "Last name must be at least 2 characters.",
   }),
-  id_number: z.string().max(10).min(2, { message: "ID number is required" }),
+  national_id: z.string().max(10).min(2, { message: "ID number is required" }),
   phone_number: z.string({ required_error: "Phone number is required" }),
   email: z.string().email({
     message: "Please enter a valid email address.",
@@ -63,7 +63,7 @@ const formSchema = z.object({
   date_of_birth: z.date({
     required_error: "A date of birth is required.",
   }),
-  tax_number: z.string({ required_error: "Tax number is required" }),
+  kra_pin: z.string({ required_error: "Tax number is required" }),
   country: z.string({ required_error: "Country is required" }),
   county: z.string({ required_error: "County is required" }),
   city: z.string({ required_error: "City is required" }),
@@ -72,10 +72,11 @@ const formSchema = z.object({
 
 const CustomersEdit = () => {
   const { customerId } = useParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { data: customer } = useFetchSingleObject<CustomerProps>(
-    `customers/${customerId}`, customerId ? true : false
+    `customers/${customerId}`,
+    customerId ? true : false,
   );
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,20 +85,20 @@ const CustomersEdit = () => {
       first_name: "",
       middle_name: "",
       last_name: "",
-      id_number: "",
+      national_id: "",
       phone_number: "",
       email: "",
-      tax_number: "",
+      kra_pin: "",
       country: "",
       county: "",
       city: "",
-      po_box: 0
+      po_box: 0,
     },
-    values: customer
+    values: customer,
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+    console.log(values);
     setLoading(true);
     try {
       // Format the date_of_birth to YYYY-MM-DD
@@ -106,14 +107,17 @@ const CustomersEdit = () => {
         date_of_birth: format(values.date_of_birth, "yyyy-MM-dd"),
       };
       if (customerId) {
-        await axios.patch(`${apiBaseUrl}/customers/${customerId}/`, formattedValues);
+        await axios.patch(
+          `${apiBaseUrl}/customers/${customerId}/`,
+          formattedValues,
+        );
         toast.success("Customer information updated successfully");
       } else {
         await axios.post(`${apiBaseUrl}/customers/`, formattedValues);
         toast.success("Customer created successfully");
       }
       setLoading(false);
-      navigate("/customers")
+      navigate("/customers");
     } catch (error) {
       setLoading(false);
       toast.error("Hmmm! Something went wrong. Please check and try again");
@@ -135,6 +139,8 @@ const CustomersEdit = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {/* customers details */}
           <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+            <div className="w-full text-lg font-medium ">Personal Details</div>
+            <Separator className="my-4 bg-slate-400" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 pb-5">
               {/* <FormField
                 control={form.control}
@@ -154,23 +160,6 @@ const CustomersEdit = () => {
                   </FormItem>
                 )}
               /> */}
-              <FormField
-                control={form.control}
-                name="id_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ID No.</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="345893"
-                        {...field}
-                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               <FormField
@@ -181,7 +170,7 @@ const CustomersEdit = () => {
                     <FormLabel>Salutation</FormLabel>
                     <Select
                       value={field.value}
-                      onValueChange={v => v!= "" && field.onChange(v)}
+                      onValueChange={(v) => v != "" && field.onChange(v)}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -191,7 +180,10 @@ const CustomersEdit = () => {
                       <SelectContent>
                         <SelectItem value="Mr">Mr</SelectItem>
                         <SelectItem value="Mrs">Mrs</SelectItem>
-                        <SelectItem value="Miss">Miss</SelectItem>
+                        <SelectItem value="Ms">Ms</SelectItem>
+                        <SelectItem value="Dr">Dr</SelectItem>
+                        <SelectItem value="Prof">Prof</SelectItem>
+                        <SelectItem value="Rev">Rev</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -251,6 +243,23 @@ const CustomersEdit = () => {
               />
               <FormField
                 control={form.control}
+                name="national_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>National ID</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="345893"
+                        {...field}
+                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="phone_number"
                 render={({ field }) => (
                   <FormItem>
@@ -296,7 +305,7 @@ const CustomersEdit = () => {
                             variant={"outline"}
                             className={cn(
                               "w-[240px] pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                           >
                             {field.value ? (
@@ -326,10 +335,10 @@ const CustomersEdit = () => {
               />
               <FormField
                 control={form.control}
-                name="tax_number"
+                name="kra_pin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tax No.</FormLabel>
+                    <FormLabel>KRA PIN</FormLabel>
                     <FormControl>
                       <Input
                         placeholder=""
@@ -345,7 +354,7 @@ const CustomersEdit = () => {
           </div>
           {/* Address */}
           <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
-            <div className="w-full text-lg font-medium ">Addresses</div>
+            <div className="w-full text-lg font-medium ">Address</div>
             <Separator className="my-4 bg-slate-400" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               <FormField
@@ -382,24 +391,6 @@ const CustomersEdit = () => {
                   </FormItem>
                 )}
               />
-              {/* <FormField
-                control={form.control}
-                name="ward"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Ward</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder=""
-                        {...field}
-                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
-                      />
-                    </FormControl>
-                    <FormDescription>Identification number</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
               <FormField
                 control={form.control}
                 name="city"
@@ -417,24 +408,37 @@ const CustomersEdit = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="po_box"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>P.O. Box</FormLabel>
+            </div>
+            {/* EMPLOYMENT DETAILS */}
+            <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+              <div className="w-full text-lg font-medium ">
+                Employment Details
+              </div>
+              <Separator className="my-4 bg-slate-400" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <FormItem>
+                  <FormLabel>Salutation</FormLabel>
+                  <Select
+                    value=""
+                    // onValueChange={(v) => v != "" && field.onChange(v)}
+                  >
                     <FormControl>
-                      <Input
-                        placeholder=""
-                        type="number"
-                        {...field}
-                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
-                      />
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select salutation" />
+                      </SelectTrigger>
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <SelectContent>
+                      <SelectItem value="EMPLOYED">Employed</SelectItem>
+                      <SelectItem value="SELF_EMPLOYED">
+                        Self Employed
+                      </SelectItem>
+                      <SelectItem value="BUSINESS">Business Owner</SelectItem>
+                      <SelectItem value="UNEMPLOYED">Unemployed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </div>
             </div>
           </div>
           <Button type="submit">Submit</Button>

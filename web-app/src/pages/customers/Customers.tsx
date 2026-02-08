@@ -1,23 +1,26 @@
 // import Button from "@/components/Button";
 import { useDataFetch } from "@/hooks/useDataFetch";
 import { ColumnDef } from "@tanstack/react-table";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 // components
 import { DataTable } from "@/components/data-table";
 import Spinner from "@/components/Spinner";
 import LucideIcon from "@/components/LucideIcon";
 // types
-import { CustomerProps } from "@/types";
+// import { CustomerProps } from "@/types";
+// Services - API calls
+import { CustomerProps, customersService } from "@/services/customers";
 
 const columns: ColumnDef<CustomerProps>[] = [
   {
-    accessorKey: "id",
-    header: "Customer ID",
+    accessorKey: "membership_number",
+    header: "Customer Number",
     cell: ({ row }) => {
       return (
         <div>
           <Link to={`/customers/view/${row.original.id}`}>
-            {row.original.id}
+            {row.original.membership_number}
           </Link>
         </div>
       );
@@ -29,7 +32,7 @@ const columns: ColumnDef<CustomerProps>[] = [
   },
   {
     accessorKey: "last_name",
-    header: "last_name",
+    header: "Last_ Name",
   },
   {
     accessorKey: "email",
@@ -37,7 +40,7 @@ const columns: ColumnDef<CustomerProps>[] = [
   },
   { accessorKey: "phone_number", header: "Phone Number" },
   {
-    accessorKey: "id_number",
+    accessorKey: "national_id",
     header: "ID Number",
   },
   {
@@ -45,19 +48,23 @@ const columns: ColumnDef<CustomerProps>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex items-center justify-center w-8 h-8 rounded-full border border-slate-400 text-slate-600">
-          <Link to={`/customers/edit/${row.original.id}`} >
-            <LucideIcon name='Pen' size={17}/>
+          <Link to={`/customers/edit/${row.original.id}`}>
+            <LucideIcon name="Pen" size={17} />
           </Link>
         </div>
       );
     },
-  }
+  },
 ];
 
 const Customers = () => {
-  const { data, loading, error } = useDataFetch<CustomerProps>('customers');
+  // const { data, loading, error } = useDataFetch<CustomerProps>('customers');
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["customers"], // Unique key for caching and tracking
+    queryFn: customersService.getCustomers, // Function that returns a promise
+  });
   // Show loading indicator when loading
-  if (loading)
+  if (isLoading)
     return (
       <div className="w-full min-h-screen flex justify-center items-center">
         <Spinner />
@@ -77,7 +84,7 @@ const Customers = () => {
         title="Customers"
         route="/customers/edit"
         btnTitle="Create Customer"
-        data={data}
+        data={data ?? []}
         columns={columns}
         filters="email"
       />
