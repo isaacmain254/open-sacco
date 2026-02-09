@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { CirclePlus } from "lucide-react";
 
 import { useFetchSingleObject } from "@/hooks/useFetchSingleObject";
 import { cn } from "@/lib/utils";
@@ -68,16 +69,18 @@ const formSchema = z.object({
   county: z.string({ required_error: "County is required" }),
   city: z.string({ required_error: "City is required" }),
   po_box: z.coerce.number().min(2, { message: "P.O Box required" }),
+  // employer_name:
 });
 
 const CustomersEdit = () => {
-  const { customerId } = useParams();
-  const navigate = useNavigate();
+  // const { customerId } = useParams();
+  // const customerId = ""
+  // const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { data: customer } = useFetchSingleObject<CustomerProps>(
-    `customers/${customerId}`,
-    customerId ? true : false,
-  );
+  // const { data: customer } = useFetchSingleObject(
+  //   `customers/${customerId}`,
+  //   customerId ? true : false,
+  // );
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -93,37 +96,53 @@ const CustomersEdit = () => {
       county: "",
       city: "",
       po_box: 0,
+      // employer_name: "",
+      next_of_kin: [
+        {
+          name: "",
+          relationship: "",
+          phone_number: "",
+          national_id: "",
+        },
+      ],
     },
-    values: customer,
+    // values: customer,
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    setLoading(true);
-    try {
-      // Format the date_of_birth to YYYY-MM-DD
-      const formattedValues = {
-        ...values,
-        date_of_birth: format(values.date_of_birth, "yyyy-MM-dd"),
-      };
-      if (customerId) {
-        await axios.patch(
-          `${apiBaseUrl}/customers/${customerId}/`,
-          formattedValues,
-        );
-        toast.success("Customer information updated successfully");
-      } else {
-        await axios.post(`${apiBaseUrl}/customers/`, formattedValues);
-        toast.success("Customer created successfully");
-      }
-      setLoading(false);
-      navigate("/customers");
-    } catch (error) {
-      setLoading(false);
-      toast.error("Hmmm! Something went wrong. Please check and try again");
-      console.log(error);
-    }
-  }
+  const { control } = form;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "next_of_kin",
+  });
+
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   console.log(values);
+  //   setLoading(true);
+  //   try {
+  //     // Format the date_of_birth to YYYY-MM-DD
+  //     const formattedValues = {
+  //       ...values,
+  //       date_of_birth: format(values.date_of_birth, "yyyy-MM-dd"),
+  //     };
+  //     if (customerId) {
+  //       await axios.patch(
+  //         `${apiBaseUrl}/customers/${customerId}/`,
+  //         formattedValues,
+  //       );
+  //       toast.success("Customer information updated successfully");
+  //     } else {
+  //       await axios.post(`${apiBaseUrl}/customers/`, formattedValues);
+  //       toast.success("Customer created successfully");
+  //     }
+  //     setLoading(false);
+  //     navigate("/customers");
+  //   } catch (error) {
+  //     setLoading(false);
+  //     toast.error("Hmmm! Something went wrong. Please check and try again");
+  //     console.log(error);
+  //   }
+  // }
 
   if (loading)
     return (
@@ -136,7 +155,8 @@ const CustomersEdit = () => {
     <div>
       <h1 className="text-2xl font-medium">New Customer</h1>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* onSubmit={form.handleSubmit(onSubmit)}  */}
+        <form className="space-y-8">
           {/* customers details */}
           <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
             <div className="w-full text-lg font-medium ">Personal Details</div>
@@ -409,39 +429,218 @@ const CustomersEdit = () => {
                 )}
               />
             </div>
-            {/* EMPLOYMENT DETAILS */}
-            <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
-              <div className="w-full text-lg font-medium ">
-                Employment Details
-              </div>
-              <Separator className="my-4 bg-slate-400" />
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <FormItem>
-                  <FormLabel>Salutation</FormLabel>
-                  <Select
-                    value=""
-                    // onValueChange={(v) => v != "" && field.onChange(v)}
-                  >
+          </div>
+          {/* EMPLOYMENT DETAILS */}
+          <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+            <div className="w-full text-lg font-medium ">
+              Employment Details
+            </div>
+            <Separator className="my-4 bg-slate-400" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              <FormItem>
+                <FormLabel>Salutation</FormLabel>
+                <Select
+                  value=""
+                  // onValueChange={(v) => v != "" && field.onChange(v)}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select salutation" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="EMPLOYED">Employed</SelectItem>
+                    <SelectItem value="SELF_EMPLOYED">Self Employed</SelectItem>
+                    <SelectItem value="BUSINESS">Business Owner</SelectItem>
+                    <SelectItem value="UNEMPLOYED">Unemployed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+              <FormField
+                control={form.control}
+                name="employer_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Employer Name</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select salutation" />
-                      </SelectTrigger>
+                      <Input
+                        placeholder=""
+                        {...field}
+                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
+                      />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="EMPLOYED">Employed</SelectItem>
-                      <SelectItem value="SELF_EMPLOYED">
-                        Self Employed
-                      </SelectItem>
-                      <SelectItem value="BUSINESS">Business Owner</SelectItem>
-                      <SelectItem value="UNEMPLOYED">Unemployed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="job_title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Job Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder=""
+                        {...field}
+                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="monthly_income"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Monthly Income</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder=""
+                        {...field}
+                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="business_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Business Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder=""
+                        {...field}
+                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="business_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Business Type</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder=""
+                        {...field}
+                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
-          <Button type="submit">Submit</Button>
+          {/* Next Of Kin DETAILS */}
+          <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+            <div className="w-full text-lg font-medium ">NextOfKin Details</div>
+            <Separator className="my-4 bg-slate-400" />
+            {fields.map((item, index) => (
+              <div
+                key={item.id}
+                className="w-full flex items-center gap-5 mb-3"
+              >
+                <div className="w-[98%] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                  <FormField
+                    control={form.control}
+                    name={`next_of_kin.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`next_of_kin.${index}.relationship`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Relationship</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`next_of_kin.${index}.phone_number`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`next_of_kin.${index}.national_id`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>National ID</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {fields.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    className="text-red-500"
+                  >
+                    X
+                  </button>
+                )}
+              </div>
+            ))}
+            <div
+              className="inline-flex items-center gap-1.5 mt-3 cursor-pointer hover:underline"
+              onClick={() =>
+                append({
+                  name: "",
+                  relationship: "",
+                  phone_number: "",
+                  national_id: "",
+                })
+              }
+            >
+              <CirclePlus size={18} />
+              Add another Next of kin
+            </div>
+          </div>
+
+          <div className="w-full flex items-center justify-end">
+            <Button type="submit">Save</Button>
+          </div>
         </form>
       </Form>
     </div>
