@@ -1,25 +1,22 @@
 // import Button from "@/components/Button";
-import { useDataFetch } from "@/hooks/useDataFetch";
 import { ColumnDef } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 // components
 import { DataTable } from "@/components/data-table";
 import Spinner from "@/components/Spinner";
 import LucideIcon from "@/components/LucideIcon";
-// types
-// import { CustomerProps } from "@/types";
 // Services - API calls
-import { CustomerProps, customersService } from "@/services/customers";
+import { MemberProps } from "@/services/members";
+import { useGetMembers } from "@/hooks/api/members";
 
-const columns: ColumnDef<CustomerProps>[] = [
+const columns: ColumnDef<MemberProps>[] = [
   {
     accessorKey: "membership_number",
-    header: "Customer Number",
+    header: "Member Number",
     cell: ({ row }) => {
       return (
-        <div>
-          <Link to={`/customers/view/${row.original.id}`}>
+        <div className="underline">
+          <Link to={`/members/view/${row.original.id}`}>
             {row.original.membership_number}
           </Link>
         </div>
@@ -44,25 +41,32 @@ const columns: ColumnDef<CustomerProps>[] = [
     header: "ID Number",
   },
   {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      return (
+        <div
+          className={`font-light rounded-full px-1 py-0.5 text-center ${row.original.status === "Active" ? "bg-green-600 text-white" : row.original.status === "Suspended" ? "bg-red-600 text-white" : "bg-blue-900 text-white"}`}
+        >
+          {row.original.status}
+        </div>
+      );
+    },
+  },
+  {
     header: "Actions",
     cell: ({ row }) => {
       return (
-        <div className="flex items-center justify-center w-8 h-8 rounded-full border border-slate-400 text-slate-600">
-          <Link to={`/customers/edit/${row.original.id}`}>
-            <LucideIcon name="Pen" size={17} />
-          </Link>
-        </div>
+        <Link to={`/members/edit/${row.original.id}`}>
+          <LucideIcon name="SquarePen" size={17} />
+        </Link>
       );
     },
   },
 ];
 
-const Customers = () => {
-  // const { data, loading, error } = useDataFetch<CustomerProps>('customers');
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["customers"], // Unique key for caching and tracking
-    queryFn: customersService.getCustomers, // Function that returns a promise
-  });
+const Members = () => {
+  const { data: members, error, isLoading } = useGetMembers();
   // Show loading indicator when loading
   if (isLoading)
     return (
@@ -81,15 +85,15 @@ const Customers = () => {
   return (
     <>
       <DataTable
-        title="Customers"
-        route="/customers/edit"
-        btnTitle="Create Customer"
-        data={data ?? []}
+        title="Members"
+        route="/members/edit"
+        btnTitle="Create Member"
+        data={members ?? []}
         columns={columns}
-        filters="email"
+        filters="national_id"
       />
     </>
   );
 };
 
-export default Customers;
+export default Members;

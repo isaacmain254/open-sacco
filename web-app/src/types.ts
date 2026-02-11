@@ -19,23 +19,6 @@ export type UserProps = {
   profile: Profile;
 };
 
-type CustomerProps = {
-  id: number;
-  salutation: string;
-  first_name: string;
-  middle_name: string;
-  last_name: string;
-  id_number: string;
-  phone_number: string;
-  email: string;
-  date_of_birth: Date;
-  tax_number: string;
-  country: string;
-  county: string;
-  city: string;
-  po_box: number;
-};
-
 export type AccountProps = {
   account_number: number;
   account_type: "Savings" | "Current" | "Fixed" | "Joint" | "Corporate";

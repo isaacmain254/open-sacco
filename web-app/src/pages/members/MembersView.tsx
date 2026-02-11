@@ -1,54 +1,28 @@
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-// import { useFetchSingleObject } from "@/hooks/useFetchSingleObject";
-// types
-// import {
-//   AccountProps,
-//   CustomerProps,
-//   LoanProps,
-//   TransactionProps,
-// } from "@/types";
-// import { useDataFetch } from "@/hooks/useDataFetch";
+
 // components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
-  TableCell,
+  // TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { customersService } from "@/services/customers";
+// import { Badge } from "@/components/ui/badge";
+
 import Spinner from "@/components/Spinner";
+// hooks
+import { useGetMemberById } from "@/hooks/api/members";
 
-const CustomersView = () => {
-  const { customerId } = useParams();
-  // const { data: customer } = useFetchSingleObject<CustomerProps>(
-  //   `customers/${customerId}`
-  // );
-  // const { data: customerAccounts } = useDataFetch<AccountProps>(
-  //   `accounts/?customer_id=${customerId}`
-  // );
-  // const { data: customerTransactions } = useDataFetch<TransactionProps>(
-  //   `transactions/?customer_id=${customerId}`
-  // );
-  // const { data: customerLoans } = useDataFetch<LoanProps>(
-  //   `loans/?customer_id=${customerId}`
-  // );
+const MembersView = () => {
+  const { memberId } = useParams();
 
-  const {
-    data: customer,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["customer", customerId],
-    queryFn: () => customersService.getCustomerById(customerId!),
-    enabled: !!customerId,
-  });
+  // Get member details
+  const { data: member, isLoading, error } = useGetMemberById(memberId!);
+  const nextOfKin = member?.next_of_kin ?? [];
 
-  console.log("Customer data:", customer);
   // Show loading indicator when loading
   if (isLoading)
     return (
@@ -76,61 +50,60 @@ const CustomersView = () => {
             </h3>
             <div className="font-medium">
               Membership No:{" "}
-              <span className="font-light">{customer?.membership_number}</span>
+              <span className="font-light">{member?.membership_number}</span>
             </div>
             <div className="font-medium">
               Salutation:{" "}
-              <span className="font-light">{customer?.salutation}</span>
+              <span className="font-light">{member?.salutation}</span>
             </div>
             <div className="font-medium">
               First Name:{" "}
-              <span className="font-light">{customer?.first_name}</span>
+              <span className="font-light">{member?.first_name}</span>
             </div>
             <div className="font-medium">
               Middle Name:{" "}
-              <span className="font-light">{customer?.middle_name}</span>
+              <span className="font-light">{member?.middle_name}</span>
             </div>
             <div className="font-medium">
-              Last Name:{" "}
-              <span className="font-light">{customer?.last_name}</span>
+              Last Name: <span className="font-light">{member?.last_name}</span>
             </div>
             <div className="font-medium">
               National ID:{" "}
-              <span className="font-light">{customer?.national_id}</span>
+              <span className="font-light">{member?.national_id}</span>
             </div>
             <div className="font-medium">
               Phone Number:{" "}
-              <span className="font-light">{customer?.phone_number}</span>
+              <span className="font-light">{member?.phone_number}</span>
             </div>
             <div className="font-medium">
-              Email: <span className="font-light">{customer?.email}</span>
+              Email: <span className="font-light">{member?.email}</span>
             </div>
             <div className="font-medium">
               Date of Birth:{" "}
               <span className="font-light">
-                {customer?.date_of_birth.toString()}
+                {member?.date_of_birth.toString()}
               </span>
             </div>
             <div className="font-medium">
-              KRA PIN: <span className="font-light">{customer?.kra_pin}</span>
+              KRA PIN: <span className="font-light">{member?.kra_pin}</span>
             </div>
             <div className="font-medium">
-              Country: <span className="font-light">{customer?.country}</span>
+              Country: <span className="font-light">{member?.country}</span>
             </div>
             <div className="font-medium">
-              County: <span className="font-light">{customer?.county}</span>
+              County: <span className="font-light">{member?.county}</span>
             </div>
 
             <div className="font-medium">
-              City: <span className="font-light">{customer?.city}</span>
+              City: <span className="font-light">{member?.city}</span>
             </div>
 
             <div className="font-medium">
               Status:{" "}
               <span
-                className={`font-light rounded-full px-2 text-center ${customer?.status === "Active" ? "bg-green-600 text-white" : customer?.status === "Suspended" ? "bg-red-600 text-white" : "bg-blue-900 text-white"}`}
+                className={`font-light rounded-full px-2 text-center ${member?.status === "Active" ? "bg-green-600 text-white" : member?.status === "Suspended" ? "bg-red-600 text-white" : "bg-blue-900 text-white"}`}
               >
-                {customer?.status}
+                {member?.status}
               </span>
             </div>
           </div>
@@ -142,37 +115,37 @@ const CustomersView = () => {
             <div className="font-medium">
               Employment Type :{" "}
               <span className="font-light">
-                {customer?.employment?.employment_type}
+                {member?.employment?.employment_type}
               </span>
             </div>
             <div className="font-medium">
               EMployment :{" "}
               <span className="font-light">
-                {customer?.employment?.employer_name}
+                {member?.employment?.employer_name}
               </span>
             </div>
             <div className="font-medium">
               JOb Title :{" "}
               <span className="font-light">
-                {customer?.employment?.job_title}
+                {member?.employment?.job_title}
               </span>
             </div>
             <div className="font-medium">
               Monthly Income:{" "}
               <span className="font-light">
-                {customer?.employment?.job_title}
+                {member?.employment?.job_title}
               </span>
             </div>
             <div className="font-medium">
               Business Type:{" "}
               <span className="font-light">
-                {customer?.employment?.business_type}
+                {member?.employment?.business_type}
               </span>
             </div>
             <div className="font-medium">
               Business Name:{" "}
               <span className="font-light">
-                {customer?.employment?.business_name}
+                {member?.employment?.business_name}
               </span>
             </div>
           </div>
@@ -180,8 +153,8 @@ const CustomersView = () => {
             <h3 className="text-center font-semibold text-lg pb-2">
               Next Of Kin Details
             </h3>
-            {customer?.next_of_kin.length > 0 &&
-              customer?.next_of_kin.map((nextOfKin) => (
+            {nextOfKin &&
+              member?.next_of_kin?.map((nextOfKin) => (
                 <div key={nextOfKin.id} className="my-4">
                   <div className="font-medium">
                     Name :<span className="font-light">{nextOfKin.name}</span>
@@ -195,7 +168,8 @@ const CustomersView = () => {
                     <span className="font-light">{nextOfKin.phone_number}</span>
                   </div>
                   <div className="font-medium">
-                    National ID :<span className="font-light">{nextOfKin.national_id}</span>
+                    National ID :
+                    <span className="font-light">{nextOfKin.national_id}</span>
                   </div>
                 </div>
               ))}
@@ -315,4 +289,4 @@ const CustomersView = () => {
   );
 };
 
-export default CustomersView;
+export default MembersView;

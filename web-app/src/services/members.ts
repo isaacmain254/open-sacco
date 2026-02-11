@@ -26,7 +26,7 @@ interface KycDocument {
   verified_by: string;
 }
 
-export interface CustomerProps {
+export interface MemberProps {
   id: string;
   membership_number: string;
   salutation: "Mr" | "Mrs" | "MS" | "Dr" | "Prof" | "Rev";
@@ -42,14 +42,20 @@ export interface CustomerProps {
   county: string;
   city: string;
   status: "Active" | "Closed" | "Dormant" | "Suspended" | "Pending";
-  next_of_kin: NextOfKin[];
-  employment: Employment;
-  kyc_documents: KycDocument[];
+  next_of_kin?: NextOfKin[];
+  employment?: Employment;
+  kyc_documents?: KycDocument[];
 }
 
-export const customersService = {
-  getCustomers: () => api.get("/members") as Promise<CustomerProps[]>,
+export const membersService = {
+  getMembers: () => api.get("/members") as Promise<MemberProps[]>,
 
-  getCustomerById: (customerId: string) =>
-    api.get(`/members/${customerId}`) as Promise<CustomerProps>,
+  getMemberById: (memberId: string) =>
+    api.get(`/members/${memberId}/`) as Promise<MemberProps>,
+
+  createMember: (memberData: Omit<MemberProps, "id" | "membership_number">) =>
+    api.post("/members/", memberData) as Promise<MemberProps>,
+
+  updateMember: (memberId: string, memberData: Partial<MemberProps>) =>
+    api.put(`/members/${memberId}/`, memberData) as Promise<MemberProps>,
 };
