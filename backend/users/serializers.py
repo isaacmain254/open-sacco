@@ -8,6 +8,12 @@ from rest_framework.validators import UniqueValidator
 # from .models import Profile
 User = get_user_model()
 
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "email", "role", "profile_image", "username"]
+
 # class UserProfileSerializer(serializers.ModelSerializer):
 #     role_display = serializers.SerializerMethodField()
 

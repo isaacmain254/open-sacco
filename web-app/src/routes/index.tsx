@@ -10,10 +10,10 @@ import SignIn from "../pages/auth/SignIn.tsx";
 import SignUp from "../pages/auth/SignUp.tsx";
 import ForgotPassword from "../pages/auth/ForgotPassword.tsx";
 import PasswordResetConfirm from "../pages/auth/PasswordResetConfirm.tsx";
-// customers
-import Customers from "../pages/customers/Customers.tsx";
-import CustomersEdit from "../pages/customers/CustomersEdit.tsx";
-import CustomersView from "../pages/customers/CustomersView.tsx";
+// Members
+import Members from "@/pages/members/Members.tsx";
+import MembersEdit from "@/pages/members/MembersEdit.tsx";
+import MembersView from "@/pages/members/MembersView.tsx";
 // accounts
 import Accounts from "../pages/accounts/Accounts.tsx";
 import AccountsEdit from "../pages/accounts/AccoutsEdit.tsx";
@@ -60,9 +60,9 @@ export const router = createBrowserRouter([
         element: <App />, // dashboard shell
         children: [
           { index: true, element: <DashBoard /> },
-          { path: "customers", element: <Customers /> },
-          { path: "customers/edit/:customerId?", element: <CustomersEdit /> },
-          { path: "customers/view/:customerId", element: <CustomersView /> },
+          { path: "members", element: <Members /> },
+          { path: "members/edit/:memberId?", element: <MembersEdit /> },
+          { path: "members/view/:memberId?", element: <MembersView /> },
           { path: "accounts", element: <Accounts /> },
           { path: "accounts/edit/:accountNo?", element: <AccountsEdit /> },
           { path: "accounts/view/:accountNo", element: <AccountsView /> },

@@ -27,16 +27,16 @@ class Member(models.Model):
         MR = 'Mr', _('Mr.')
         MRS = 'Mrs', _('Mrs.')
         MS = 'Ms', _('Ms.')
-        DR = 'Dr.', _('Dr.')
-        PROF = 'Prof.', _('Prof.')
-        REV = 'Rev.', _('Rev.')
+        DR = 'Dr', _('Dr.')
+        PROF = 'Prof', _('Prof.')
+        REV = 'Rev', _('Rev.')
 
     class Status(models.TextChoices):
         ACTIVE = 'Active', _('Active')
         CLOSED = 'Closed', _('Closed')
         DORMANT = 'Dormant', _('Dormant')
         SUSPENDED = 'Suspended', _('Suspended')
-        PENDING = 'PENDING', _("PENDING")
+        PENDING = 'Pending', _("Pending")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 

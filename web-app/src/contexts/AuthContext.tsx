@@ -16,7 +16,8 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
 }
-
+// FIXME: BUG - check for access and refresh token validity on backend.
+//  I changed some access token characters ans I'm still authenticated and token was not refreshed
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined,
 );
@@ -41,46 +42,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
-    const accessExpiresAt = localStorage.getItem("expiresAt");
+    // const accessExpiresAt = localStorage.getItem("expiresAt");
 
     if (!refreshToken) {
       logout();
       setIsLoading(false);
+      navigate("/login");
       return;
     }
 
     // 1 Access token still valid
-    if (
-      accessToken &&
-      accessExpiresAt &&
-      Date.now() < Number(accessExpiresAt)
-    ) {
+    if (accessToken) {
       setIsAuthenticated(true);
       setIsLoading(false);
       navigate("/");
       return;
     }
 
-    // TODO: fIX REFRESH TOKEN GENERATION
-    // 2 Access token expired → refresh
-    // if (refreshToken && !accessToken) {
-    //   generateRefreshToken(
-    //     { refresh: refreshToken },
-    //     {
-    //       onSuccess: (data) => {
-    //         const newExpiresAt = Date.now() + SESSION_DURATION;
-    //         localStorage.setItem("accessToken", data.access);
-    //         localStorage.setItem("expiresAt", newExpiresAt.toString());
-    //         setIsAuthenticated(true);
-    //         setIsLoading(false);
-    //       },
-    //       onError: () => {
-    //         logout();
-    //         setIsLoading(false);
-    //       },
-    //     },
-    //   );
-    // }
+  
+      generateRefreshToken(
+        { refresh: refreshToken },
+        {
+          onSuccess: (data) => {
+            const newExpiresAt = Date.now() + SESSION_DURATION;
+            localStorage.setItem("accessToken", data.access);
+            localStorage.setItem("expiresAt", newExpiresAt.toString());
+            setIsAuthenticated(true);
+            setIsLoading(false);
+          },
+          onError: (error) => {
+            logout();
+            console.error("Failed to refresh token:", error);
+            setIsLoading(false);
+          },
+        },
+      );
+   
   }, [isAuthenticated]);
 
   const login = (data: AuthResponse) => {

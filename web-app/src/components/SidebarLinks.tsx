@@ -14,9 +14,9 @@ const sidebarItems = [
     to: "/",
   },
   {
-    label: "Customers",
+    label: "Members",
     icon: "Users",
-    to: "/customers",
+    to: "/members",
   },
   {
     label: "Accounts",
@@ -39,9 +39,9 @@ const sidebarItems = [
     to: "/settings",
   },
   {
-    label: 'Help',
-    icon: 'CircleHelp',
-    to: '/help'
+    label: "Help",
+    icon: "CircleHelp",
+    to: "/help",
   },
   {
     label: "Users",

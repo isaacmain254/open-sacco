@@ -208,4 +208,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-AUTH_USER_MODEL="users.User"
+AUTH_USER_MODEL = "users.User"
+# No append slash at the end of URL
+# APPEND_SLASH = True
