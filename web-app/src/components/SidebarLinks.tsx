@@ -20,18 +20,23 @@ const sidebarItems = [
   },
   {
     label: "Accounts",
-    icon: "CreditCard",
+    icon: "PiggyBank",
     to: "/accounts",
   },
   {
     label: "Transactions",
-    icon: "Wallet",
+    icon: "ArrowRightLeft",
     to: "/transactions",
   },
   {
     label: "Loans",
-    icon: "Wallet",
+    icon: "HandCoins",
     to: "/loans",
+  },
+  {
+    label: "Expenses",
+    icon: "ReceiptText",
+    to: "/expenses",
   },
   {
     label: "Settings",
@@ -48,6 +53,16 @@ const sidebarItems = [
     icon: "Users",
     to: "/users",
   },
+  {
+    label: "SMS",
+    icon: "MessageCircle",
+    to: "/sms",
+  },
+  {
+    label: "Emails",
+    icon: "Mail",
+    to: "/emails",
+  }
 ];
 const SidebarLinks: FC<SidebarLinksProps> = ({ onClick }) => {
   return (

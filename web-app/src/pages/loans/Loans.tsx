@@ -54,22 +54,23 @@ const columns: ColumnDef<LoanProps>[] = [
 ];
 
 const Loans = () => {
-  const { data, loading, error } = useDataFetch<LoanProps>("loans");
+  let data = []
+  // const { data, loading, error } = useDataFetch<LoanProps>("loans");
   // Show loading indicator when loading
-  if (loading)
-    return (
-      <div className="w-full min-h-screen flex justify-center items-center">
-        <Spinner />
-      </div>
-    );
+  // if (loading)
+  //   return (
+  //     <div className="w-full min-h-screen flex justify-center items-center">
+  //       <Spinner />
+  //     </div>
+  //   );
 
   // handling error
-  if (error)
-    return (
-      <div className="w-full min-h-screen flex justify-center items-center">
-        Error : {error.message}
-      </div>
-    );
+  // if (error)
+  //   return (
+  //     <div className="w-full min-h-screen flex justify-center items-center">
+  //       Error : {error.message}
+  //     </div>
+  //   );
   return (
     <>
       <DataTable

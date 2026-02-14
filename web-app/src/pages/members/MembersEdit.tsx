@@ -40,7 +40,7 @@ import { toast } from "react-toastify";
 import {
   useCreateMember,
   useGetMemberById,
-  useUpdateMember
+  useUpdateMember,
 } from "@/hooks/api/members";
 
 // form validation - zod schemas
@@ -114,14 +114,15 @@ const MembersEdit = () => {
   const navigate = useNavigate();
 
   const [continueAdding, setContinueAdding] = useState(false);
-  // let continueAdding = false;
 
   // Get member details
   const { data: member, isLoading } = useGetMemberById(memberId!);
   // Create member mutation
-  const { mutate: createMember, isPending: isCreatingMember } =useCreateMember()
+  const { mutate: createMember, isPending: isCreatingMember } =
+    useCreateMember();
   // Update member mutation
-  const { mutate: updateMember, isPending: isUpdatingMember } = useUpdateMember()
+  const { mutate: updateMember, isPending: isUpdatingMember } =
+    useUpdateMember();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

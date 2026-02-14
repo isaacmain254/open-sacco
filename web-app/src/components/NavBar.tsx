@@ -72,7 +72,7 @@ const NavBar: FC<NavBarProps> = ({
     logout();
   };
   return (
-    <div className="max-w-full relative flex items-center justify-between text-white bg-blue-700 h-16 dark:bg-blue-800 dark:text-slate-300 rounded-lg px-3 ">
+    <div className="w-full mx-auto fixed top-0 left-0  flex items-center justify-between  text-white bg-blue-700 h-16 dark:bg-blue-800 dark:text-slate-300 rounded-lg px-3 ">
       <div className="flex items-center">
         <img src={Logo} alt="Open SACCO logo" className="w-20 h-20" />
         <div

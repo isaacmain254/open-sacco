@@ -1,20 +1,23 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 // components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
-  // TableCell,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 import Spinner from "@/components/Spinner";
 // hooks
 import { useGetMemberById } from "@/hooks/api/members";
+import { useGetMemberAccounts } from "@/hooks/api/accounts";
+import { useGetMemberTransactions } from "@/hooks/api/transactions";
+import { formatDate } from "@/lib/utils";
 
 const MembersView = () => {
   const { memberId } = useParams();
@@ -23,8 +26,17 @@ const MembersView = () => {
   const { data: member, isLoading, error } = useGetMemberById(memberId!);
   const nextOfKin = member?.next_of_kin ?? [];
 
+  // Get member accounts
+  const { data: memberAccounts, isLoading: isMemberAccountsLoading } =
+    useGetMemberAccounts(memberId!);
+  console.log("members account", memberAccounts);
+
+  // Get member transactions
+  const { data: memberTransactions, isLoading: isMemberTransactionsLoading } =
+    useGetMemberTransactions(memberId!);
+
   // Show loading indicator when loading
-  if (isLoading)
+  if (isLoading || isMemberAccountsLoading)
     return (
       <div className="w-full min-h-screen flex justify-center items-center">
         <Spinner />
@@ -192,16 +204,27 @@ const MembersView = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {/* {customerAccounts.slice(0, 10).map((account) => (
-                      <TableRow key={account.account_number}>
-                        <TableCell>{account.account_number}</TableCell>
-                        <TableCell>{account.account_type}</TableCell>
-                        <TableCell>${account.balance}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline"> {account.status}</Badge>
-                        </TableCell>
+                    {memberAccounts?.length ? (
+                      memberAccounts?.slice(0, 10).map((account) => (
+                        <TableRow key={account.account_number}>
+                          <TableCell>
+                            <Link
+                              to={`/accounts/view/${account.account_number}`}
+                              className="underline"
+                            >
+                              {account.account_number}
+                            </Link>
+                          </TableCell>
+                          <TableCell>{account.product}</TableCell>
+                          <TableCell>Ksh {account.balance}</TableCell>
+                          <TableCell>{account.is_active}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow className="w-full text-center">
+                        No account found for this member
                       </TableRow>
-                    ))} */}
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -216,25 +239,33 @@ const MembersView = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Account</TableHead>
-                      <TableHead>Type</TableHead>
+                      <TableHead>Transaction ID</TableHead>
+                      <TableHead>Account Number</TableHead>
+                      <TableHead>Transaction Type</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {/* {customerTransactions.slice(0, 10).map((transaction) => (
-                      <TableRow key={transaction.transaction_id}>
-                        <TableCell>{transaction.account}</TableCell>
-                        <TableCell>{transaction.transaction_type}</TableCell>
-                        <TableCell className="">
-                          ${transaction.amount}
-                        </TableCell>
-                        <TableCell>
-                          {transaction.transaction_date.toString()}
-                        </TableCell>
+                    {memberTransactions?.length ? (
+                      memberTransactions?.slice(0, 10).map((transaction) => (
+                        <TableRow key={transaction.id}>
+                          <TableCell>{transaction.reference}</TableCell>
+                          <TableCell>{transaction.account_number}</TableCell>
+                          <TableCell>{transaction.transaction_type}</TableCell>
+                          <TableCell className="">
+                            Ksh {transaction.amount}
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(transaction.created_at)}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow className="w-full text-center">
+                        No transactions found for this member
                       </TableRow>
-                    ))} */}
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

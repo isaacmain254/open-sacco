@@ -1,13 +1,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router-dom";
-import { useDataFetch } from "@/hooks/useDataFetch";
 
-// types
-import { AccountProps } from "@/types";
 // components
 import { DataTable } from "@/components/data-table";
 import LucideIcon from "@/components/LucideIcon";
 import Spinner from "@/components/Spinner";
+import { useGetAccounts } from "@/hooks/api/accounts";
+import { AccountProps } from "@/services/accounts";
 
 const columns: ColumnDef<AccountProps>[] = [
   {
@@ -15,7 +14,7 @@ const columns: ColumnDef<AccountProps>[] = [
     header: "Account Number",
     cell: ({ row }) => {
       return (
-        <div>
+        <div className="underline">
           <Link to={`/accounts/view/${row.original.account_number}`}>
             {row.original.account_number}
           </Link>
@@ -24,20 +23,20 @@ const columns: ColumnDef<AccountProps>[] = [
     },
   },
   {
-    accessorKey: "customer",
-    header: "Customer ID",
+    accessorKey: "member",
+    header: "Member ID",
   },
   {
-    accessorKey: "account_type",
-    header: "Account Type",
+    accessorKey: "product",
+    header: "Product ID",
   },
   {
     accessorKey: "balance",
     header: "Balance",
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "is_active",
+    header: "Active",
   },
   {
     header: "Edit",
@@ -45,7 +44,7 @@ const columns: ColumnDef<AccountProps>[] = [
       return (
         <div>
           <Link to={`/accounts/edit/${row.original.account_number}`}>
-            <LucideIcon name="Pen" size={18} />{" "}
+            <LucideIcon name="SquarePen" size={18} />{" "}
           </Link>
         </div>
       );
@@ -53,9 +52,9 @@ const columns: ColumnDef<AccountProps>[] = [
   },
 ];
 const Accounts = () => {
-  const { data, loading, error } = useDataFetch<AccountProps>("accounts");
+  const { data: accounts, isLoading, error } = useGetAccounts();
   // Show loading indicator when loading
-  if (loading)
+  if (isLoading)
     return (
       <div className="w-full min-h-screen flex justify-center items-center">
         <Spinner />
@@ -75,7 +74,7 @@ const Accounts = () => {
         title="Accounts"
         route="/accounts/edit"
         btnTitle="Create Account"
-        data={data}
+        data={accounts || []}
         columns={columns}
         filters="account_number"
       />

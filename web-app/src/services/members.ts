@@ -51,7 +51,7 @@ export const membersService = {
   getMembers: () => api.get("/members") as Promise<MemberProps[]>,
 
   getMemberById: (memberId: string) =>
-    api.get(`/members/${memberId}/`) as Promise<MemberProps>,
+    api.get(`/members/${memberId}`) as Promise<MemberProps>,
 
   createMember: (memberData: Omit<MemberProps, "id" | "membership_number">) =>
     api.post("/members/", memberData) as Promise<MemberProps>,

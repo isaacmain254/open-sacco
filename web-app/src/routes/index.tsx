@@ -29,6 +29,9 @@ import Profile from "../pages/Profile.tsx";
 import LoansEdit from "../pages/loans/LoansEdit.tsx";
 import LoansView from "../pages/loans/LoansView.tsx";
 import Help from "../pages/Help.tsx";
+import { BulkSMS } from "@/pages/sms/BulkSMS.tsx";
+import { BulkEmail } from "@/pages/emails/BulkEmail.tsx";
+import { Expenses } from "@/pages/expenses/index.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -74,10 +77,13 @@ export const router = createBrowserRouter([
           { path: "loans", element: <Loans /> },
           { path: "loans/edit/:loanId?", element: <LoansEdit /> },
           { path: "loans/view/:loanId", element: <LoansView /> },
+          { path: "expenses", element: <Expenses /> },
           { path: "settings", element: <Settings /> },
           { path: "help", element: <Help /> },
           { path: "users", element: <Users /> },
           { path: "profile", element: <Profile /> },
+          {path: "sms", element: <BulkSMS />},
+          {path: "emails", element: <BulkEmail />}
         ],
       },
     ],
