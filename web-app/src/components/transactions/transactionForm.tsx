@@ -20,6 +20,7 @@ import { Input } from "../ui/input";
 import { usePostTransaction } from "@/hooks/api/transactions";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   transaction_type: z.string().min(1, "Transaction type is required"),
@@ -28,14 +29,20 @@ const formSchema = z.object({
   narration: z.string().optional(),
 });
 
-export const TransactionForm = () => {
+export interface TransactionFormProps {
+  accountNo?: string;
+}
+
+export const TransactionForm = ({ accountNo }: TransactionFormProps) => {
   const { mutate, isPending } = usePostTransaction();
+
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       transaction_type: "",
       amount: 0,
-      account_number: "",
+      account_number: accountNo || "",
       narration: "",
     },
   });
@@ -50,6 +57,7 @@ export const TransactionForm = () => {
       onSuccess: () => {
         form.reset();
         toast.success("Transaction completed successfully");
+        navigate(`/transactions`);
       },
       onError: () => {
         toast.error("Transaction failed");
@@ -60,6 +68,23 @@ export const TransactionForm = () => {
     <div>
       <Form {...form}>
         <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField
+            control={form.control}
+            name="account_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Account Number</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter account number"
+                    {...field}
+                    disabled={!!accountNo}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="transaction_type"
@@ -84,19 +109,7 @@ export const TransactionForm = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="account_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Account Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter account number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <FormField
             control={form.control}
             name="amount"

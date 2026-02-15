@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-
+import { useState } from "react";
 // components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,8 +18,16 @@ import { useGetMemberById } from "@/hooks/api/members";
 import { useGetMemberAccounts } from "@/hooks/api/accounts";
 import { useGetMemberTransactions } from "@/hooks/api/transactions";
 import { formatDate } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import Modal from "@/components/ui/Modal";
+import AddAccountForm from "@/components/accounts/AddAccountForm";
+import { TransactionForm } from "@/components/transactions/transactionForm";
+import LucideIcon from "@/components/LucideIcon";
 
 const MembersView = () => {
+  const [openAddAccountModal, setOpenAddAccountModal] = useState(false);
+  const [openTransactionModal, setOpenTransactionModal] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<string>("");
   const { memberId } = useParams();
 
   // Get member details
@@ -55,6 +63,7 @@ const MembersView = () => {
     <div>
       <h1 className="text-2xl font-medium">Member Details</h1>
       <div className="my-5 space-y-10 lg:space-y-0 lg:grid lg:grid-cols-12 gap-8">
+        {/* LEFT SIDE */}
         <div className="col-span-3  space-y-8">
           <div className="bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
             <h3 className="text-center font-semibold text-lg pb-2">
@@ -187,11 +196,21 @@ const MembersView = () => {
               ))}
           </div>
         </div>
+        {/* RIGHT SIDE */}
         <div className="col-span-9 space-y-8">
+          {/* Accounts */}
           <div className=" bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
             <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
-              <CardHeader className="flex flex-row items-center">
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Accounts</CardTitle>
+                <Button
+                  onClick={() => {
+                    setSelectedAccount("");
+                    setOpenAddAccountModal(true);
+                  }}
+                >
+                  Add Account
+                </Button>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -201,6 +220,7 @@ const MembersView = () => {
                       <TableHead>Type</TableHead>
                       <TableHead>Balance</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -218,6 +238,26 @@ const MembersView = () => {
                           <TableCell>{account.product}</TableCell>
                           <TableCell>Ksh {account.balance}</TableCell>
                           <TableCell>{account.is_active}</TableCell>
+                          <TableCell className="flex gap-6">
+                            <LucideIcon
+                              name="SquarePen"
+                              className="w-3 h-3 cursor-pointer"
+                              color="#3b3a3aff"
+                              onClick={() => {
+                                setOpenAddAccountModal(true);
+                                setSelectedAccount(account.account_number);
+                              }}
+                            />
+                            <LucideIcon
+                              name="ArrowRightLeft"
+                              className="w-3 h-3 cursor-pointer"
+                              color="#3b3a3aff"
+                              onClick={() => {
+                                setOpenTransactionModal(true);
+                                setSelectedAccount(account.account_number);
+                              }}
+                            />
+                          </TableCell>
                         </TableRow>
                       ))
                     ) : (
@@ -230,6 +270,7 @@ const MembersView = () => {
               </CardContent>
             </Card>
           </div>
+          {/* Transactions */}
           <div className=" bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
             <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
               <CardHeader className="flex flex-row items-center">
@@ -271,6 +312,7 @@ const MembersView = () => {
               </CardContent>
             </Card>
           </div>
+          {/* Loan History */}
           <div className=" bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
             <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
               <CardHeader className="flex flex-row items-center">
@@ -316,6 +358,26 @@ const MembersView = () => {
           </div>
         </div>
       </div>
+      {/* Add Account Modal */}
+      <Modal
+        isOpen={openAddAccountModal}
+        onClose={() => setOpenAddAccountModal(false)}
+        title="Add Account"
+      >
+        <AddAccountForm
+          memberNo={member?.membership_number}
+          accountNo={selectedAccount}
+        />
+      </Modal>
+
+      {/* Add Transaction Modal */}
+      <Modal
+        isOpen={openTransactionModal}
+        onClose={() => setOpenTransactionModal(false)}
+        title="Create Transaction"
+      >
+        <TransactionForm accountNo={selectedAccount} />
+      </Modal>
     </div>
   );
 };

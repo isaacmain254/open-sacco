@@ -1,4 +1,4 @@
-import { accountsService } from "@/services/accounts";
+import { AccountProps, accountsService } from "@/services/accounts";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
 export const useGetAccounts = () => {
@@ -36,3 +36,9 @@ export const useCreateAccount = () => {
     mutationFn: accountsService.createAccount
   });
 }
+
+export const useUpdateAccount = () => {
+  return useMutation({
+    mutationFn: ({accountNo, data}: {accountNo: string, data: Partial<AccountProps>}) => accountsService.updateAccount(accountNo, data)
+  });
+} 

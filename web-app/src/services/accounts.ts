@@ -24,5 +24,5 @@ export const accountsService = {
 
   createAccount: (account: Omit<AccountProps, "account_number" | "balance">) => api.post("/accounts/", account) as Promise<AccountProps>,
 
-  updateAccount: (account: AccountProps) => api.patch(`/accounts/${account.account_number}/`, account) as Promise<AccountProps>,
+  updateAccount: (accountNo: string, data: Partial<AccountProps>) => api.patch(`/accounts/${accountNo}/`, data) as Promise<AccountProps>,
 };

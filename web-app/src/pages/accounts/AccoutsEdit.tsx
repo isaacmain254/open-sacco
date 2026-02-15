@@ -1,14 +1,9 @@
-import { useState, useEffect } from "react";
+import {  useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import {  useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { apiBaseUrl } from "@/constants";
-// custom hooks
-import { useFetchSingleObject } from "@/hooks/useFetchSingleObject";
-// types
-// import { AccountProps } from "@/types";
+
 // components
 import {
   Form,
@@ -44,13 +39,7 @@ const AccountsEdit = () => {
   // const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
 
-  // TODO: This is just a working solution, using condition on custom hook is breaking React rules
-  // Fetch account data
-  // const { data: accountDetails } = useFetchSingleObject<AccountProps>(
-  //   `accounts/${accountNo}`,
-  //   accountNo ? true : false
-  // );
-  // console.log(accountDetails);
+
 // Fetch all products
   const { data: products, isLoading: productsLoading } = useGetProducts()
   // Get account by ID
