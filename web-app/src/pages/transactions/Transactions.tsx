@@ -47,6 +47,10 @@ const columns: ColumnDef<TransactionProps>[] = [
     header: "Amount",
   },
   {
+    accessorKey: "performed_by_username",
+    header: "Sevrved By",
+  },
+  {
     accessorKey: "created_at",
     header: "Transaction Date",
     cell: ({ row }) => {

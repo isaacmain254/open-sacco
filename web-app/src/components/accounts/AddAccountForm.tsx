@@ -102,7 +102,7 @@ export default function AddAccountForm({
         {
           onSuccess: () => {
             toast.success("Account updated successfully");
-            navigate(`/members/view/${memberNo}`);
+            navigate(`/accounts`);
           },
           onError: (error) => {
             console.log(error);
@@ -114,7 +114,11 @@ export default function AddAccountForm({
       createAccount(payload, {
         onSuccess: () => {
           toast.success("Account created successfully");
-          navigate(`/members/view/${memberNo}`);
+          if (memberNo) {
+            navigate(`/members/view/${memberNo}`);
+          } else {
+            navigate(`/accounts`);
+          }
         },
         onError: () => {
           toast.error("An error occurred");

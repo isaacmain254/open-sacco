@@ -1,7 +1,7 @@
-import {  useEffect } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {  useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 // components
@@ -24,58 +24,62 @@ import {
 } from "@/components/ui/select";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
-import { useCreateAccount, useGetAccountById, useGetProducts } from "@/hooks/api/accounts";
+import {
+  useCreateAccount,
+  useGetAccountById,
+  useGetProducts,
+} from "@/hooks/api/accounts";
 
 // form schema validation with zod
 const formSchema = z.object({
   // customer: z.string(coerce.number()),
   member: z.string().min(1, "This field is required"),
   product: z.string().min(1, "This field is required"),
- is_active: z.boolean().default(true)
+  is_active: z.boolean().default(true),
 });
 
 const AccountsEdit = () => {
   const { accountNo } = useParams();
   // const [loading, setLoading] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-
-// Fetch all products
-  const { data: products, isLoading: productsLoading } = useGetProducts()
+  // Fetch all products
+  const { data: products, isLoading: productsLoading } = useGetProducts();
   // Get account by ID
-  const { data: account, isLoading: accountLoading } = useGetAccountById(accountNo!)
+  const { data: account, isLoading: accountLoading } = useGetAccountById(
+    accountNo!,
+  );
   // Create account
-  const { mutate: createAccount, isPending: isCreatingAccount } = useCreateAccount()
+  const { mutate: createAccount, isPending: isCreatingAccount } =
+    useCreateAccount();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       member: "",
       product: "",
-      is_active: false
+      is_active: false,
     },
   });
 
-
   // Populate form with existing customer data for edit
   useEffect(() => {
-    if(account){
+    if (account) {
       form.reset({
         member: account.member,
         product: account.product,
-        is_active: account.is_active
-      })
-}
-  },[account])
+        is_active: account.is_active,
+      });
+    }
+  }, [account]);
 
   // handle form submit
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-  
     const payload = {
       member: values.member,
       product: values.product,
-      is_active: values.is_active
-    }
+      is_active: values.is_active,
+    };
     createAccount(payload, {
       onSuccess: () => {
         toast.success("Account created successfully");
@@ -83,11 +87,11 @@ const AccountsEdit = () => {
       },
       onError: () => {
         toast.error("An error occurred");
-      }
-    })
+      },
+    });
   };
 
-  if (productsLoading || accountLoading )
+  if (productsLoading || accountLoading)
     return (
       <div className="w-full min-h-screen flex justify-center items-center">
         <Spinner />
@@ -139,7 +143,8 @@ const AccountsEdit = () => {
                       <SelectContent>
                         {products?.map((product, index) => (
                           <SelectItem key={index} value={product.name}>
-                            {product.name.charAt(0).toUpperCase() + product.name.slice(1)}
+                            {product.name.charAt(0).toUpperCase() +
+                              product.name.slice(1)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -174,12 +179,11 @@ const AccountsEdit = () => {
                   )}
                 />
               )}
-      
-            
             </div>
           </div>
           <Button type="submit">
-            {isCreatingAccount ? "Submitting..." : "Create Account"}</Button>
+            {isCreatingAccount ? "Submitting..." : "Create Account"}
+          </Button>
         </form>
       </Form>
     </div>

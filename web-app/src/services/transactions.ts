@@ -10,6 +10,7 @@ export interface TransactionProps {
   performed_by: string;
   created_at: string;
   account_number: string;
+  performed_by_username: string;
 }
 
 export const transactionsService = {
@@ -21,7 +22,7 @@ export const transactionsService = {
   postTransaction: (
     payload: Omit<
       TransactionProps,
-      "id" | "reference" | "created_at" | "performed_by" | "account_number"
+      "id" | "reference" | "created_at" | "performed_by" | "account_number" | "performed_by_username"
     >,
   ) => api.post("/transactions/", payload) as Promise<TransactionProps>,
 

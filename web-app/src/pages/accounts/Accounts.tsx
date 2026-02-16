@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router-dom";
 
@@ -7,51 +8,14 @@ import LucideIcon from "@/components/LucideIcon";
 import Spinner from "@/components/Spinner";
 import { useGetAccounts } from "@/hooks/api/accounts";
 import { AccountProps } from "@/services/accounts";
+import AddAccountForm from "@/components/accounts/AddAccountForm";
+import Modal from "@/components/ui/Modal";
+import CopyToClipboard from "@/components/ui/clipboard";
 
-const columns: ColumnDef<AccountProps>[] = [
-  {
-    accessorKey: "account_number",
-    header: "Account Number",
-    cell: ({ row }) => {
-      return (
-        <div className="underline">
-          <Link to={`/accounts/view/${row.original.account_number}`}>
-            {row.original.account_number}
-          </Link>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "member",
-    header: "Member ID",
-  },
-  {
-    accessorKey: "product",
-    header: "Product ID",
-  },
-  {
-    accessorKey: "balance",
-    header: "Balance",
-  },
-  {
-    accessorKey: "is_active",
-    header: "Active",
-  },
-  {
-    header: "Edit",
-    cell: ({ row }) => {
-      return (
-        <div>
-          <Link to={`/accounts/edit/${row.original.account_number}`}>
-            <LucideIcon name="SquarePen" size={18} />{" "}
-          </Link>
-        </div>
-      );
-    },
-  },
-];
 const Accounts = () => {
+  const [openAddAccountModal, setOpenAddAccountModal] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<string>("");
+
   const { data: accounts, isLoading, error } = useGetAccounts();
   // Show loading indicator when loading
   if (isLoading)
@@ -68,16 +32,74 @@ const Accounts = () => {
         Error : {error.message}
       </div>
     );
+
+  const columns: ColumnDef<AccountProps>[] = [
+    {
+      accessorKey: "account_number",
+      header: "Account Number",
+      cell: ({ row }) => {
+        return (
+          <CopyToClipboard text={row.original.account_number} to={`/accounts/view/${row.original.account_number}`} />
+        );
+      },
+    },
+    {
+      accessorKey: "member",
+      header: "Member ID",
+    },
+    {
+      accessorKey: "product",
+      header: "Product ID",
+    },
+    {
+      accessorKey: "balance",
+      header: "Balance",
+    },
+    {
+      accessorKey: "is_active",
+      header: "Active",
+    },
+    {
+      header: "Actions",
+      cell: ({ row }) => {
+        return (
+          <div>
+            <LucideIcon
+              name="SquarePen"
+              size={18}
+              className="cursor-pointer"
+              onClick={() => {
+                setOpenAddAccountModal(true);
+                setSelectedAccount(row.original.account_number);
+              }}
+            />
+          </div>
+        );
+      },
+    },
+  ];
   return (
     <>
       <DataTable
         title="Accounts"
-        route="/accounts/edit"
         btnTitle="Create Account"
+        onClick={() => {
+          setOpenAddAccountModal(true);
+        }}
         data={accounts || []}
         columns={columns}
         filters="account_number"
       />
+      <Modal
+        isOpen={openAddAccountModal}
+        onClose={() => {
+          setOpenAddAccountModal(false);
+          setSelectedAccount("");
+        }}
+        title="Add Account"
+      >
+        <AddAccountForm accountNo={selectedAccount} />
+      </Modal>
     </>
   );
 };
