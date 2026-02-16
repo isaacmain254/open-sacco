@@ -88,7 +88,7 @@ class Member(models.Model):
         ordering = ["membership_number"]
 
     def __str__(self):
-        return self.first_name
+        return self.membership_number
 
 
 class NextOfKin(models.Model):

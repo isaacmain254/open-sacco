@@ -29,6 +29,7 @@ interface DataTableProps<TData, TValue> {
   title?: string;
   btnTitle?: string;
   filters: string;
+  onClick?: () => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -38,6 +39,7 @@ export function DataTable<TData, TValue>({
   btnTitle,
   title,
   filters,
+  onClick,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const table = useReactTable({
@@ -56,12 +58,19 @@ export function DataTable<TData, TValue>({
     <div>
       <h1 className="text-2xl font-medium">{title}</h1>
       <div className="flex flex-col md:flex-row justify-between items-center py-5 gap-y-4">
-        <Link className="self-start" to={route ? route : ""}>
-          <Button className="flex gap-x-2">
+        {route ? (
+          <Link className="self-start" to={route ? route : ""}>
+            <Button className="flex gap-x-2">
+              <CirclePlus size={18} />
+              {btnTitle}
+            </Button>
+          </Link>
+        ) : (
+           <Button className="flex gap-x-2" onClick={onClick}>
             <CirclePlus size={18} />
             {btnTitle}
           </Button>
-        </Link>
+        )}
         <Input
           placeholder="Search ..."
           value={(table.getColumn(filters)?.getFilterValue() as string) ?? ""}
@@ -121,7 +130,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex justify-between my-5">
+      {/* Pagination starts here */}
+      <div className="flex flex-col md:flex-row justify-between items-center my-5 gap-3">
         <div className="space-x-3">
           <button
             className="border rounded p-2"
@@ -152,7 +162,7 @@ export function DataTable<TData, TValue>({
             {">>"}
           </button>
         </div>
-        <div className="flex gap-x-3">
+        <div className="flex flex-col md:flex-row gap-3">
           <span className="flex items-center gap-1">
             <div>Page</div>
             <strong>
@@ -174,6 +184,7 @@ export function DataTable<TData, TValue>({
               className="border p-1 rounded w-16 dark:bg-blue-900"
             />
           </span>
+
           <select
             value={table.getState().pagination.pageSize}
             onChange={(e) => {

@@ -36,10 +36,10 @@ class MemberSerializer(WritableNestedModelSerializer):
         extra_kwargs = {
             'national_id': {
                 'validators': [
-                    UniqueValidator(
-                        queryset=Member.objects.all(),
-                        message="A member with this national ID already exists."
-                    )
+                    # UniqueValidator(
+                    #     queryset=Member.objects.all(),
+                    #     message="A member with this national ID already exists."
+                    # )
                 ]
             }
         }

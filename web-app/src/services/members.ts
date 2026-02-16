@@ -1,7 +1,6 @@
 import api from "@/lib/api";
 
 interface NextOfKin {
-  id: number;
   name: string;
   relationship: string;
   phone_number: string;
@@ -9,7 +8,6 @@ interface NextOfKin {
 }
 
 interface Employment {
-  id: number;
   employment_type: "EMPLOYED" | "SELF_EMPLOYED" | "UNEMPLOYED" | "BUSINESS";
   employer_name: string | null;
   job_title: string | null;
@@ -19,7 +17,6 @@ interface Employment {
 }
 
 interface KycDocument {
-  id: number;
   document_type: "NATIONAL_ID" | "PASSPORT_PHOTO" | "SIGNATURE";
   file: string;
   verified: boolean;
@@ -27,7 +24,6 @@ interface KycDocument {
 }
 
 export interface MemberProps {
-  id: string;
   membership_number: string;
   salutation: "Mr" | "Mrs" | "MS" | "Dr" | "Prof" | "Rev";
   first_name: string;
@@ -51,9 +47,9 @@ export const membersService = {
   getMembers: () => api.get("/members") as Promise<MemberProps[]>,
 
   getMemberById: (memberId: string) =>
-    api.get(`/members/${memberId}/`) as Promise<MemberProps>,
+    api.get(`/members/${memberId}`) as Promise<MemberProps>,
 
-  createMember: (memberData: Omit<MemberProps, "id" | "membership_number">) =>
+  createMember: (memberData: Omit<MemberProps, "membership_number">) =>
     api.post("/members/", memberData) as Promise<MemberProps>,
 
   updateMember: (memberId: string, memberData: Partial<MemberProps>) =>

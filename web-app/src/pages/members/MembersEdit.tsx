@@ -40,7 +40,7 @@ import { toast } from "react-toastify";
 import {
   useCreateMember,
   useGetMemberById,
-  useUpdateMember
+  useUpdateMember,
 } from "@/hooks/api/members";
 
 // form validation - zod schemas
@@ -52,7 +52,12 @@ const nextOfKinSchema = z.object({
 });
 
 const employmentSchema = z.object({
-  employment_type: z.string().min(1, "Employment type is required"),
+  employment_type: z.enum([
+    "EMPLOYED",
+    "SELF_EMPLOYED",
+    "UNEMPLOYED",
+    "BUSINESS",
+  ]),
   employer_name: z.string().nullable().optional(),
   job_title: z.string().nullable().optional(),
   monthly_income: z
@@ -76,7 +81,7 @@ const kycDocumentSchema = z.object({
 });
 
 const formSchema = z.object({
-  salutation: z.string().min(1, "This field is required"),
+  salutation: z.enum(["Mr", "Mrs", "MS", "Dr", "Prof", "Rev"]),
 
   first_name: z.string().min(1, "This field is required"),
   middle_name: z.string().min(1, "This field is required"),
@@ -102,7 +107,7 @@ const formSchema = z.object({
   county: z.string().min(1, "This field is required"),
   city: z.string().min(1, "This field is required"),
 
-  status: z.string().min(1, "This field is required"),
+  status: z.enum(["Active", "Closed", "Dormant", "Suspended", "Pending"]),
   employment: employmentSchema,
 
   next_of_kin: z.array(nextOfKinSchema).optional(),
@@ -114,19 +119,20 @@ const MembersEdit = () => {
   const navigate = useNavigate();
 
   const [continueAdding, setContinueAdding] = useState(false);
-  // let continueAdding = false;
 
   // Get member details
   const { data: member, isLoading } = useGetMemberById(memberId!);
   // Create member mutation
-  const { mutate: createMember, isPending: isCreatingMember } =useCreateMember()
+  const { mutate: createMember, isPending: isCreatingMember } =
+    useCreateMember();
   // Update member mutation
-  const { mutate: updateMember, isPending: isUpdatingMember } = useUpdateMember()
+  const { mutate: updateMember, isPending: isUpdatingMember } =
+    useUpdateMember();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      salutation: "",
+      salutation: "Mr",
       first_name: "",
       middle_name: "",
       last_name: "",
@@ -138,10 +144,10 @@ const MembersEdit = () => {
       country: "",
       county: "",
       city: "",
-      status: "",
+      status: "Active",
 
       employment: {
-        employment_type: "",
+        employment_type: "EMPLOYED",
         employer_name: "",
         job_title: "",
         monthly_income: null,
@@ -150,13 +156,7 @@ const MembersEdit = () => {
       },
 
       next_of_kin: [],
-      kyc_documents: [
-        {
-          document_type: "",
-          file: null,
-          verified: false,
-        },
-      ],
+      kyc_documents: [],
     },
   });
 
@@ -197,7 +197,7 @@ const MembersEdit = () => {
 
     if (memberId) {
       updateMember(
-        { memberId, data: payload },
+        { memberId, data: payload as any },
         {
           onSuccess: () => {
             toast.success("Member updated successfully");
@@ -207,7 +207,7 @@ const MembersEdit = () => {
         },
       );
     } else {
-      createMember(payload, {
+      createMember(payload as any, {
         onSuccess: () => {
           toast.success("Member created successfully");
           if (continueAdding) {
@@ -868,7 +868,11 @@ const MembersEdit = () => {
                 className="ml-2"
                 onClick={() => setContinueAdding(true)}
               >
-                {isCreatingMember ? <Spinner /> : "Save & Continue"}
+                {isCreatingMember && continueAdding ? (
+                  <Spinner />
+                ) : (
+                  "Save & Continue"
+                )}
               </Button>
             )}
             <Button type="submit">

@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 // components
 import { DataTable } from "@/components/data-table";
 import Spinner from "@/components/Spinner";
-import LucideIcon from "@/components/LucideIcon";
+import CopyToClipboard from "@/components/ui/clipboard";
 // Services - API calls
 import { MemberProps } from "@/services/members";
 import { useGetMembers } from "@/hooks/api/members";
+import LucideIcon from "@/components/LucideIcon";
 
 const columns: ColumnDef<MemberProps>[] = [
   {
@@ -15,11 +16,7 @@ const columns: ColumnDef<MemberProps>[] = [
     header: "Member Number",
     cell: ({ row }) => {
       return (
-        <div className="underline">
-          <Link to={`/members/view/${row.original.id}`}>
-            {row.original.membership_number}
-          </Link>
-        </div>
+          <CopyToClipboard text={row.original.membership_number} to={`/members/view/${row.original.membership_number}`} />
       );
     },
   },
@@ -57,7 +54,7 @@ const columns: ColumnDef<MemberProps>[] = [
     header: "Actions",
     cell: ({ row }) => {
       return (
-        <Link to={`/members/edit/${row.original.id}`}>
+        <Link to={`/members/edit/${row.original.membership_number}`}>
           <LucideIcon name="SquarePen" size={17} />
         </Link>
       );

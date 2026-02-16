@@ -8,7 +8,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -27,6 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { mutate: generateRefreshToken } = useRefreshToken();
 
   const SESSION_DURATION = 12 * 60 * 60 * 1000; // session expires in 12 hours
@@ -55,7 +56,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (accessToken) {
       setIsAuthenticated(true);
       setIsLoading(false);
-      navigate("/");
+      // Only navigate to dashboard if user is on a public/auth page
+      if (location.pathname === "/login" || location.pathname === "/register") {
+        navigate("/");
+      }
       return;
     }
 
@@ -71,9 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setIsLoading(false);
           },
           onError: (error) => {
-            logout();
-            console.error("Failed to refresh token:", error);
+            console.error("Failed to refresh token - invalid or expired:", error);
             setIsLoading(false);
+            logout(); // Logout user when refresh token is invalid
           },
         },
       );

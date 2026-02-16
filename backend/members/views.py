@@ -36,4 +36,4 @@ class MemberViewSet(
     queryset = Member.objects.all().prefetch_related("next_of_kin")
     serializer_class = MemberSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = "id"
+    lookup_field = "membership_number"
