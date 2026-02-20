@@ -35,7 +35,7 @@ const SignIn: FC = () => {
           login(data);
           toast.success("Login successful", { autoClose: 2000 });
         },
-        onError: (error) => {
+        onError: () => {
           toast.error("Error logging in", { autoClose: 2000 });
         },
       },

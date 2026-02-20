@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 // import { useDashboardData } from "@/hooks/useDashboardData";
-import { useDataFetch } from "@/hooks/useDataFetch";
+// import { useDataFetch } from "@/hooks/useDataFetch";
 import {
   Activity,
   ArrowUpRight,
@@ -19,15 +19,15 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
+  // TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 // types
-import { LoanProps, TransactionProps } from "@/types";
+// import { LoanProps, TransactionProps } from "@/types";
 
 const DashBoard = () => {
   // const { totalCustomers, totalAccountBalance, totalLoans, totalWithdrawals } =

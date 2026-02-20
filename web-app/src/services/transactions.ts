@@ -6,7 +6,7 @@ export interface TransactionProps {
   transaction_type: string;
   amount: number;
   reference: string;
-  narration: string;
+  narration?: string;
   performed_by: string;
   created_at: string;
   account_number: string;
@@ -22,7 +22,7 @@ export const transactionsService = {
   postTransaction: (
     payload: Omit<
       TransactionProps,
-      "id" | "reference" | "created_at" | "performed_by" | "account_number" | "performed_by_username"
+      "id" | "reference" | "created_at" | "performed_by" | "account" | "performed_by_username"
     >,
   ) => api.post("/transactions/", payload) as Promise<TransactionProps>,
 

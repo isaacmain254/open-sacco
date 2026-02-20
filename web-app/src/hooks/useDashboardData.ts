@@ -1,13 +1,8 @@
-import {
-  AccountProps,
-  CustomerProps,
-  LoanProps,
-  TransactionProps,
-} from "@/types";
+import { AccountProps, LoanProps, TransactionProps } from "@/types";
 import { useDataFetch } from "./useDataFetch";
 
 export function useDashboardData() {
-  const { data: customers } = useDataFetch<CustomerProps[]>("customers");
+  const { data: customers } = useDataFetch("customers");
   const { data: accounts } = useDataFetch<AccountProps>("accounts");
   const { data: loans } = useDataFetch<LoanProps>("loans");
   const { data: transactions } = useDataFetch<TransactionProps>("transactions");

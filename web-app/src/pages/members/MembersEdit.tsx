@@ -58,15 +58,14 @@ const employmentSchema = z.object({
     "UNEMPLOYED",
     "BUSINESS",
   ]),
-  employer_name: z.string().nullable().optional(),
-  job_title: z.string().nullable().optional(),
+  employer_name: z.string().optional(),
+  job_title: z.string().optional(),
   monthly_income: z
     .union([z.number(), z.string()])
-    .transform((v) => (v === "" ? null : Number(v)))
-    .nullable()
+    .transform((v) => (v === "" ? 0 : Number(v)))
     .optional(),
-  business_name: z.string().nullable().optional(),
-  business_type: z.string().nullable().optional(),
+  business_name: z.string().optional(),
+  business_type: z.string().optional(),
 });
 
 const kycDocumentSchema = z.object({
@@ -150,7 +149,7 @@ const MembersEdit = () => {
         employment_type: "EMPLOYED",
         employer_name: "",
         job_title: "",
-        monthly_income: null,
+        monthly_income: 0,
         business_name: "",
         business_type: "",
       },
@@ -167,7 +166,7 @@ const MembersEdit = () => {
         ...member,
         next_of_kin: member.next_of_kin ?? [],
         kyc_documents: member.kyc_documents ?? [],
-        // employment: customer.employment ?? form.getValues("employment"),
+        employment: member.employment ?? form.getValues("employment"),
       });
     }
   }, [member]);
@@ -189,7 +188,7 @@ const MembersEdit = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const payload = {
+    const payload: any = {
       ...values,
       next_of_kin: values.next_of_kin ?? [],
       kyc_documents: values.kyc_documents ?? [],
@@ -197,7 +196,7 @@ const MembersEdit = () => {
 
     if (memberId) {
       updateMember(
-        { memberId, data: payload as any },
+        { memberId, data: payload  },
         {
           onSuccess: () => {
             toast.success("Member updated successfully");
@@ -207,7 +206,7 @@ const MembersEdit = () => {
         },
       );
     } else {
-      createMember(payload as any, {
+      createMember(payload, {
         onSuccess: () => {
           toast.success("Member created successfully");
           if (continueAdding) {

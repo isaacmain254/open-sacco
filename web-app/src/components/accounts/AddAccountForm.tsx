@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 // components
@@ -53,7 +53,7 @@ export default function AddAccountForm({
   // Fetch all products
   const { data: products, isLoading: productsLoading } = useGetProducts();
   // Get account by ID
-  const { data: account, isLoading: accountLoading } = useGetAccountById(
+  const { data: account   } = useGetAccountById(
     accountNo!,
   );
   // update account

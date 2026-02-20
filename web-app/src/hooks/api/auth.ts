@@ -11,7 +11,7 @@ import {
 export const useRegister = () => {
   return useMutation({
     mutationFn: (data: RegisterPayload) => authService.register(data),
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Handle successful Register
       // if (data) {
       //   localStorage.setItem("accessToken", data.accessToken);

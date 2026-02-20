@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link  } from "react-router-dom";
 
-import ProfilePlaceholder from "@/assets/profile-placeholder.png";
+// import ProfilePlaceholder from "@/assets/profile-placeholder.png";
 import Logo from "@/assets/open-sacco.png";
 // components
 import LucideIcon from "./LucideIcon";
@@ -10,7 +10,7 @@ import { Theme } from "@/contexts/ThemeContext";
 
 import { useUserProfileInfo } from "@/hooks/useUserProfile";
 // constants
-import { useLogout } from "@/hooks/api/auth";
+// import { useLogout } from "@/hooks/api/auth";
 
 interface NavBarProps {
   showMobileMenu: boolean;
@@ -51,9 +51,9 @@ const NavBar: FC<NavBarProps> = ({
     };
   }, []);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const { mutate: logout, isPending: isPendingLogout } = useLogout();
+  // const { mutate: logout, isPending: isPendingLogout } = useLogout();
 
   // handle logout
   // const handleLogout = async () => {
@@ -69,7 +69,8 @@ const NavBar: FC<NavBarProps> = ({
   // };
 
   const handleLogout = () => {
-    logout();
+    // logout();
+    console.log("Logged out")
   };
   return (
     <div className="w-full mx-auto fixed top-0 left-0  flex items-center justify-between  text-white bg-blue-700 h-16 dark:bg-blue-800 dark:text-slate-300 rounded-lg px-3 ">

@@ -21,6 +21,7 @@ import { usePostTransaction } from "@/hooks/api/transactions";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
+import { TransactionProps } from "@/services/transactions";
 
 const formSchema = z.object({
   transaction_type: z.string().min(1, "Transaction type is required"),
@@ -34,7 +35,7 @@ export interface TransactionFormProps {
 }
 
 export const TransactionForm = ({ accountNo }: TransactionFormProps) => {
-  const { mutate, isPending } = usePostTransaction();
+  const { mutate  } = usePostTransaction();
 
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,7 +50,8 @@ export const TransactionForm = ({ accountNo }: TransactionFormProps) => {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
-    const payload = {
+    const payload:Omit<TransactionProps,"id" | "reference" | "created_at" | "performed_by" | "account" | "performed_by_username" | ""
+        >  = {
       ...values,
       amount: Number(values.amount),
     };

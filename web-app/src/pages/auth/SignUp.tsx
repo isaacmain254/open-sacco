@@ -1,11 +1,11 @@
 import { FC, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import LoginSvg from "@/assets/authenticate.svg";
 import Logo from "@/assets/open-sacco.png";
-import { apiBaseUrl } from "@/constants";
+// import { apiBaseUrl } from "@/constants";
 // components
 import FormInput from "@/components/FormInput";
 import Button from "@/components/Button";
@@ -16,7 +16,7 @@ const SignUp: FC = () => {
   // TODO: manage input type and icon state independently and validate form input
   // const [inputType, setInputType] = useState("password");
   // const [inputIcon, setInputIcon] = useState("EyeOff");
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -33,17 +33,17 @@ const SignUp: FC = () => {
       toast.error("Passwords do not match", { autoClose: 2000 });
       return;
     }
-    setLoading(true);
+    // setLoading(true);
    register(
       { username, email, password, confirm_password: password2 },
       {
-        onSuccess: (data) => {
-          setLoading(false);
+        onSuccess: () => {
+          // setLoading(false);
           toast.success("Account created successfully", { autoClose: 2000 });
           navigate("/login");
         },
-        onError: (error) => {
-          setLoading(false);
+        onError: () => {
+          // setLoading(false);
           toast.error("Error creating account", { autoClose: 2000 });
         },
       },
@@ -104,7 +104,7 @@ const SignUp: FC = () => {
               onChange={(e) => setPassword2(e.target.value)}
             />
             <Button
-              text={loading ? <Spinner /> : "Sign Up"}
+              text={isRegisterPending ? <Spinner /> : "Sign Up"}
               type="submit"
               variant="secondary"
               className="my-5 w-full"

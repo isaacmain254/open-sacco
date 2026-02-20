@@ -9,11 +9,11 @@ interface NextOfKin {
 
 interface Employment {
   employment_type: "EMPLOYED" | "SELF_EMPLOYED" | "UNEMPLOYED" | "BUSINESS";
-  employer_name: string | null;
-  job_title: string | null;
-  monthly_income: number | null;
-  business_name: string | null;
-  business_type: string | null;
+  employer_name: string;
+  job_title: string;
+  monthly_income: number;
+  business_name: string;
+  business_type: string;
 }
 
 interface KycDocument {

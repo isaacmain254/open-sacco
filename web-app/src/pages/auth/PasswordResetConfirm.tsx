@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate  } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import LoginSvg from "@/assets/authenticate.svg";
@@ -35,7 +35,7 @@ const PasswordResetConfirm: FC = () => {
           toast.success(data.message, { autoClose: 2000 });
           navigate("/login");
         },
-        onError: (error) => {
+        onError: () => {
           toast.error("Error resetting password", { autoClose: 2000 });
         },
       },

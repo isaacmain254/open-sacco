@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 // components
 import { DataTable } from "@/components/data-table";

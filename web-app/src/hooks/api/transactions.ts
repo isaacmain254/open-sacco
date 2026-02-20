@@ -11,7 +11,7 @@ export const useGetTransactions = () => {
 
 export const usePostTransaction = () => {
     return useMutation({
-        mutationFn: (payload: Omit<TransactionProps, "id" | "reference" | "created_at" | "performed_by" | "account_number">) => transactionsService.postTransaction(payload),
+        mutationFn: (payload: Omit<TransactionProps, "id" | "reference" | "created_at" | "performed_by" | "account" | "performed_by_username">) => transactionsService.postTransaction(payload),
     });
 }
 

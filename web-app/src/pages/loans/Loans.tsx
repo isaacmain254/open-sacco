@@ -1,9 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router-dom";
 
-import { useDataFetch } from "@/hooks/useDataFetch";
+// import { useDataFetch } from "@/hooks/useDataFetch";
 // componnts
-import Spinner from "@/components/Spinner";
+// import Spinner from "@/components/Spinner";
 import { DataTable } from "@/components/data-table";
 import LucideIcon from "@/components/LucideIcon";
 // types
@@ -54,7 +54,8 @@ const columns: ColumnDef<LoanProps>[] = [
 ];
 
 const Loans = () => {
-  let data = []
+  //TODO: Update with data from API
+  const data: LoanProps[] = []
   // const { data, loading, error } = useDataFetch<LoanProps>("loans");
   // Show loading indicator when loading
   // if (loading)

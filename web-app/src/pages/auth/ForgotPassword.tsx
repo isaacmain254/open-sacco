@@ -30,7 +30,7 @@ const ForgotPassword: FC = () => {
           toast.success(data.message, { autoClose: 2000 });
           setEmail("");
         },
-        onError: (error) => {
+        onError: () => {
           toast.error("Error sending password reset email", {
             autoClose: 2000,
           });

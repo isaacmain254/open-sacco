@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 
 import Spinner from "@/components/Spinner";
 // hooks
@@ -44,7 +44,7 @@ const MembersView = () => {
     useGetMemberTransactions(memberId!);
 
   // Show loading indicator when loading
-  if (isLoading || isMemberAccountsLoading)
+  if (isLoading || isMemberAccountsLoading || isMemberTransactionsLoading)
     return (
       <div className="w-full min-h-screen flex justify-center items-center">
         <Spinner />
@@ -176,7 +176,7 @@ const MembersView = () => {
             </h3>
             {nextOfKin &&
               member?.next_of_kin?.map((nextOfKin) => (
-                <div key={nextOfKin.id} className="my-4">
+                <div key={nextOfKin.national_id} className="my-4">
                   <div className="font-medium">
                     Name :<span className="font-light">{nextOfKin.name}</span>
                   </div>
