@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - backend/.env
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    env_file:
+      - backend/.env
+
+  web-app:
+    build:
+      context: ./web-app
+      dockerfile: Dockerfile
+    container_name: web-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web-app:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    env_file:
+      - web-app/.env
+
+volumes:
+  postgres_data:
