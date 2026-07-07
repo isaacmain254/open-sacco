@@ -38,12 +38,83 @@
 - Node.js 16+ and npm or yarn
 - PostgreSQL
 - Git
+- Docker and Docker Compose
 
 ### Clone the Repository
 ```bash
 git clone https://github.com/isaacmain254/open-sacco.git
 cd open-sacco
 ```
+
+### Run Locally with Docker Compose
+From the repository root, start the full stack with:
+
+```bash
+docker compose up --build
+```
+
+This will start:
+- PostgreSQL on http://localhost:5432
+- The Django backend on http://localhost:8000
+- The React frontend on http://localhost:3000
+
+Make sure the environment files exist before starting the stack:
+- backend/.env
+- web-app/.env
+
+Useful commands:
+
+```bash
+# Stop the containers
+docker compose down
+
+# Rebuild and start again after code or dependency changes
+docker compose up --build
+
+# Run a Django management command inside the backend container
+docker compose exec backend python manage.py <command>
+```
+
+Example for creating a superuser:
+
+```bash
+docker compose exec backend python manage.py createsuperuser
+```
+
+### Seed Demo Data
+The project includes a built-in demo data command that populates sample records for the main modules so the app can be explored immediately after setup.
+
+#### Option 1: Automatic setup with Docker Compose
+After the containers are running, seed the database with:
+
+```bash
+docker compose exec backend python manage.py seed_demo_data
+```
+
+This creates sample data for:
+- members and KYC-related records
+- customer and account records
+- savings products, accounts, and transactions
+- loan products, loan accounts, schedules, and transactions
+- an admin user with the email admin@example.com and password admin12345
+
+#### Option 2: Manual setup
+If you are running the backend directly instead of through Docker, run the same command after migrations:
+
+```bash
+python manage.py migrate
+python manage.py seed_demo_data
+```
+
+You can also create a superuser manually if you prefer:
+
+```bash
+python manage.py createsuperuser
+```
+
+### Manual Setup
+
+Manual setup is also possible if you prefer not to use Docker.
 
 Backend Setup
 Navigate to the backend folder:
