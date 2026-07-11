@@ -6,16 +6,19 @@ from django.db.models import Sum
 
 from .models import Customer, Account, Transaction, Loan
 from .serializers import CustomerSerializer, AccountSerializer, TransactionSerializer, LoanSerializer
+from users.permissions import HasAccountAccess, HasLoanAccess, HasMemberAccess, HasTransactionAccess
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [HasMemberAccess]
 
 
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
+    permission_classes = [HasAccountAccess]
 
     def get_queryset(self):
         queryset = Account.objects.all()
@@ -34,6 +37,7 @@ class AccountViewSet(viewsets.ModelViewSet):
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+    permission_classes = [HasTransactionAccess]
 
     def get_queryset(self):
         queryset = Transaction.objects.all()
@@ -51,6 +55,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
 class LoanViewSet(viewsets.ModelViewSet):
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
+    permission_classes = [HasLoanAccess]
 
     def get_queryset(self):
         queryset = Loan.objects.all()

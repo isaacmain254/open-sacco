@@ -9,7 +9,18 @@ from members.models import Member
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = SavingsProduct
-        fields = ('name',)
+        fields = (
+            "id",
+            "name",
+            "code",
+            "minimum_balance",
+            "interest_rate",
+            "withdrawal_fee",
+            "allows_withdrawals",
+            "is_active",
+            "created_at",
+        )
+        read_only_fields = ("id", "created_at")
 
 
 

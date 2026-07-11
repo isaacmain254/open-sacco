@@ -32,6 +32,12 @@ import Help from "../pages/Help.tsx";
 import { BulkSMS } from "@/pages/sms/BulkSMS.tsx";
 import { BulkEmail } from "@/pages/emails/BulkEmail.tsx";
 import { Expenses } from "@/pages/expenses/index.tsx";
+import RequireModuleAccess from "@/components/RequireModuleAccess.tsx";
+import { AppModule } from "@/lib/access-control.ts";
+
+const protectedModulePage = (module: AppModule, element: JSX.Element) => (
+  <RequireModuleAccess module={module}>{element}</RequireModuleAccess>
+);
 
 export const router = createBrowserRouter([
   {
@@ -63,27 +69,27 @@ export const router = createBrowserRouter([
         element: <App />, // dashboard shell
         children: [
           { index: true, element: <DashBoard /> },
-          { path: "members", element: <Members /> },
-          { path: "members/edit/:memberId?", element: <MembersEdit /> },
-          { path: "members/view/:memberId?", element: <MembersView /> },
-          { path: "accounts", element: <Accounts /> },
-          { path: "accounts/edit/:accountNo?", element: <AccountsEdit /> },
-          { path: "accounts/view/:accountNo", element: <AccountsView /> },
-          { path: "transactions", element: <Transactions /> },
+          { path: "members", element: protectedModulePage("members", <Members />) },
+          { path: "members/edit/:memberId?", element: protectedModulePage("members", <MembersEdit />) },
+          { path: "members/view/:memberId?", element: protectedModulePage("members", <MembersView />) },
+          { path: "accounts", element: protectedModulePage("accounts", <Accounts />) },
+          { path: "accounts/edit/:accountNo?", element: protectedModulePage("accounts", <AccountsEdit />) },
+          { path: "accounts/view/:accountNo", element: protectedModulePage("accounts", <AccountsView />) },
+          { path: "transactions", element: protectedModulePage("transactions", <Transactions />) },
           {
             path: "transactions/edit/:transactionId?",
-            element: <TransactionsEdit />,
+            element: protectedModulePage("transactions", <TransactionsEdit />),
           },
-          { path: "loans", element: <Loans /> },
-          { path: "loans/edit/:loanId?", element: <LoansEdit /> },
-          { path: "loans/view/:loanId", element: <LoansView /> },
-          { path: "expenses", element: <Expenses /> },
+          { path: "loans", element: protectedModulePage("loans", <Loans />) },
+          { path: "loans/edit/:loanId?", element: protectedModulePage("loans", <LoansEdit />) },
+          { path: "loans/view/:loanId", element: protectedModulePage("loans", <LoansView />) },
+          { path: "expenses", element: protectedModulePage("expenses", <Expenses />) },
           { path: "settings", element: <Settings /> },
           { path: "help", element: <Help /> },
-          { path: "users", element: <Users /> },
+          { path: "users", element: protectedModulePage("users", <Users />) },
           { path: "profile", element: <Profile /> },
-          {path: "sms", element: <BulkSMS />},
-          {path: "emails", element: <BulkEmail />}
+          {path: "sms", element: protectedModulePage("communications", <BulkSMS />)},
+          {path: "emails", element: protectedModulePage("communications", <BulkEmail />)}
         ],
       },
     ],

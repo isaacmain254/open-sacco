@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Member
 from .serializers import MemberSerializer
+from users.permissions import HasMemberAccess
 
 
 # class MemberViewSet(viewsets.ViewSet):
@@ -35,5 +36,5 @@ class MemberViewSet(
 ):
     queryset = Member.objects.all().prefetch_related("next_of_kin")
     serializer_class = MemberSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [HasMemberAccess]
     lookup_field = "membership_number"

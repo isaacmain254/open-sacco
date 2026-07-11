@@ -55,7 +55,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col">
       <h1 className="text-2xl font-medium">{title}</h1>
       <div className="flex flex-col md:flex-row justify-between items-center py-5 gap-y-4">
         {route ? (
@@ -131,7 +131,7 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       {/* Pagination starts here */}
-      <div className="flex flex-col md:flex-row justify-between items-center my-5 gap-3">
+      <div className="mt-auto flex flex-col items-center justify-between gap-3 py-5 md:flex-row">
         <div className="space-x-3">
           <button
             className="border rounded p-2"

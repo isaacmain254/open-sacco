@@ -11,6 +11,7 @@ from .models import SavingsAccount, SavingsProduct, SavingsTransaction
 from .serializers import AccountSerializer, ProductSerializer, TransactionSerializer, TransactionCreateSerializer
 from .services import post_savings_transaction
 from members.models import Member
+from users.permissions import HasAccountAccess, HasProductManagementAccess, HasTransactionAccess
 
 
 class AccountViewSet(
@@ -23,7 +24,7 @@ class AccountViewSet(
     """
     A ViewSet for listing and retrieving accounts information
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [HasAccountAccess]
     queryset = SavingsAccount.objects.all()
     serializer_class = AccountSerializer
     lookup_field = "account_number"
@@ -42,7 +43,7 @@ class AccountViewSet(
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = SavingsProduct.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [HasProductManagementAccess]
 
 
 class TransactionViewSet(
@@ -58,7 +59,7 @@ class TransactionViewSet(
     Create: POST /transactions/
     Retrieve: GET /transactions/{id}/
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [HasTransactionAccess]
     queryset = SavingsTransaction.objects.select_related('account', 'account__member', 'performed_by').all()
     serializer_class = TransactionSerializer
     

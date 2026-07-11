@@ -1,5 +1,5 @@
 import { TransactionProps, transactionsService } from "@/services/transactions";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export const useGetTransactions = () => {
@@ -10,8 +10,17 @@ export const useGetTransactions = () => {
 }
 
 export const usePostTransaction = () => {
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn: (payload: Omit<TransactionProps, "id" | "reference" | "created_at" | "performed_by" | "account" | "performed_by_username">) => transactionsService.postTransaction(payload),
+        onSuccess: () => {
+            // A transaction changes the transaction list and account balances.
+            queryClient.invalidateQueries({ queryKey: ["transactions"] });
+            queryClient.invalidateQueries({ queryKey: ["accounts"] });
+            queryClient.invalidateQueries({ queryKey: ["account"] });
+            queryClient.invalidateQueries({ queryKey: ["memberAccounts"] });
+        },
     });
 }
 

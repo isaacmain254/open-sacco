@@ -2,12 +2,19 @@ import { FC } from "react";
 import { NavLink } from "react-router-dom";
 // components
 import LucideIcon from "./LucideIcon";
+import { AppModule, hasModuleAccess } from "@/lib/access-control";
+import { useUserProfileInfo } from "@/hooks/useUserProfile";
 
 interface SidebarLinksProps {
   onClick?: () => void;
 }
 
-const sidebarItems = [
+const sidebarItems: Array<{
+  label: string;
+  icon: string;
+  to: string;
+  module?: AppModule;
+}> = [
   {
     label: "Dashboard",
     icon: "BarChart4",
@@ -17,26 +24,31 @@ const sidebarItems = [
     label: "Members",
     icon: "Users",
     to: "/members",
+    module: "members",
   },
   {
     label: "Accounts",
     icon: "PiggyBank",
     to: "/accounts",
+    module: "accounts",
   },
   {
     label: "Transactions",
     icon: "ArrowRightLeft",
     to: "/transactions",
+    module: "transactions",
   },
   {
     label: "Loans",
     icon: "HandCoins",
     to: "/loans",
+    module: "loans",
   },
   {
     label: "Expenses",
     icon: "ReceiptText",
     to: "/expenses",
+    module: "expenses",
   },
   {
     label: "Settings",
@@ -52,22 +64,30 @@ const sidebarItems = [
     label: "Users",
     icon: "Users",
     to: "/users",
+    module: "users",
   },
   {
     label: "SMS",
     icon: "MessageCircle",
     to: "/sms",
+    module: "communications",
   },
   {
     label: "Emails",
     icon: "Mail",
     to: "/emails",
+    module: "communications",
   }
 ];
 const SidebarLinks: FC<SidebarLinksProps> = ({ onClick }) => {
+  const { profile } = useUserProfileInfo();
+  const visibleItems = sidebarItems.filter(
+    (item) => !item.module || hasModuleAccess(profile?.role, item.module),
+  );
+
   return (
     <>
-      {sidebarItems.map((item) => (
+      {visibleItems.map((item) => (
         <li className="" key={item.label}>
           <NavLink
             to={item.to}
