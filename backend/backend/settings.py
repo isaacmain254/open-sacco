@@ -39,15 +39,12 @@ SECRET_KEY = os.environ.get(
 # DEBUG=True
 DEBUG = bool(os.environ.get("DEBUG", default=0))
 
-# Keep explicit defaults for production domains, and allow env override.
-# Example: DJANGO_ALLOWED_HOSTS=isaactech.pythonanywhere.com,localhost,127.0.0.1
+# Domains that are allowed to serve this Django application.
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get(
-        "DJANGO_ALLOWED_HOSTS",
-        "isaactech.pythonanywhere.com,localhost,127.0.0.1,[::1]",
-    ).split(",")
-    if host.strip()
+    "isaactech.pythonanywhere.com",
+    "localhost",
+    "127.0.0.1",
+    "[::1]",
 ]
 
 
