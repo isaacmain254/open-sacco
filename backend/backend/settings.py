@@ -192,13 +192,10 @@ DEFAULT_CORS_ALLOWED_ORIGINS = [
     "https://open-sacco.vercel.app",
 ]
 
-env_cors_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "")
-if env_cors_origins.strip():
-    CORS_ALLOWED_ORIGINS = [
-        origin.strip() for origin in env_cors_origins.split(",") if origin.strip()
-    ]
-else:
-    CORS_ALLOWED_ORIGINS = DEFAULT_CORS_ALLOWED_ORIGINS
+# Keep the deployed frontend origin explicit.  Do not read this value from the
+# environment: a stale CORS_ALLOWED_ORIGINS variable on the host would replace
+# this list and make the API fail browser preflight requests.
+CORS_ALLOWED_ORIGINS = DEFAULT_CORS_ALLOWED_ORIGINS
 
 # Required for unsafe methods (POST/PUT/PATCH/DELETE) when CSRF checks are in play.
 CSRF_TRUSTED_ORIGINS = [
