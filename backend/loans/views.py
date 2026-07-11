@@ -15,10 +15,11 @@ from .serializers import (
 	LoanApplicationGuarantorSerializer,
 	LoanApplicationListSerializer,
 	LoanDisbursementSerializer,
+	LoanRepaymentSerializer,
 	LoanRejectionSerializer,
 	LoanTypeSerializer,
 )
-from .services import build_eligibility_summary, disburse_application
+from .services import build_eligibility_summary, disburse_application, post_installment_repayment
 
 
 REVIEW_ROLES = {User.ADMIN, User.MANAGER, User.OPERATION}
@@ -198,6 +199,28 @@ class LoanApplicationViewSet(
 				account=serializer.context["account"],
 				user=request.user,
 				notes=serializer.validated_data["disbursement_notes"],
+			)
+		except ValueError as exc:
+			return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+		application.refresh_from_db()
+		return Response(LoanApplicationDetailSerializer(application, context={"request": request}).data)
+
+	@action(detail=True, methods=["post"], url_path="repay")
+	def repay(self, request, application_number=None):
+		if not has_role(request.user, REVIEW_ROLES):
+			return Response({"detail": "Only managers, operations managers, or admins can post repayments."}, status=status.HTTP_403_FORBIDDEN)
+
+		application = self.get_object()
+		serializer = LoanRepaymentSerializer(data=request.data, context={"application": application})
+		serializer.is_valid(raise_exception=True)
+		try:
+			post_installment_repayment(
+				loan=serializer.context["loan"],
+				installment_number=serializer.validated_data["installment_number"],
+				account=serializer.context["account"],
+				user=request.user,
+				narration=serializer.validated_data["narration"],
 			)
 		except ValueError as exc:
 			return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)

@@ -58,7 +58,7 @@ export const useLoanAction = () => {
       applicationNumber,
       payload = {},
     }: {
-      action: "submit" | "review" | "approve" | "reject" | "disburse";
+      action: "submit" | "review" | "approve" | "reject" | "disburse" | "repay";
       applicationNumber: string;
       payload?: Record<string, string>;
     }) => {
@@ -66,6 +66,12 @@ export const useLoanAction = () => {
       if (action === "review") return loansService.review(applicationNumber);
       if (action === "approve") return loansService.approve(applicationNumber, payload.approval_notes || "");
       if (action === "reject") return loansService.reject(applicationNumber, payload.rejection_reason || "");
+      if (action === "repay") return loansService.repay(
+        applicationNumber,
+        payload.account_number || "",
+        Number(payload.installment_number),
+        payload.narration || "",
+      );
       return loansService.disburse(
         applicationNumber,
         payload.account_number || "",

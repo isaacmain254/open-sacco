@@ -393,6 +393,21 @@ class LoanSchedule(models.Model):
     total_due = models.DecimalField(max_digits=12, decimal_places=2)
 
     is_paid = models.BooleanField(default=False)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    paid_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="paid_loan_installments",
+    )
+    payment_transaction = models.OneToOneField(
+        "LoanTransaction",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="paid_installment",
+    )
 
     class Meta:
         unique_together = ("loan", "installment_number")

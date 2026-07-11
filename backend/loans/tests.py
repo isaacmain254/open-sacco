@@ -8,7 +8,7 @@ from accounts.models import SavingsAccount, SavingsProduct, SavingsTransaction
 from members.models import Member
 from users.models import User
 
-from .models import LoanAccount, LoanApplication, LoanApplicationDocument, LoanApplicationGuarantor, LoanProduct
+from .models import LoanAccount, LoanApplication, LoanApplicationDocument, LoanApplicationGuarantor, LoanProduct, LoanSchedule
 
 
 class LoanApplicationFlowTest(TestCase):
@@ -168,6 +168,34 @@ class LoanApplicationFlowTest(TestCase):
 				account=self.account,
 				transaction_type=SavingsTransaction.DEPOSIT,
 				amount=Decimal("120000.00"),
+			).exists()
+		)
+		loan = LoanAccount.objects.get(application__application_number=application_number)
+		installment = LoanSchedule.objects.get(loan=loan, installment_number=1)
+		self.assertEqual(loan.schedule.count(), 12)
+		self.assertGreater(loan.outstanding_interest, Decimal("0.00"))
+
+		repayment_response = self.client.post(
+			f"/api/v1/loans/{application_number}/repay/",
+			{
+				"account_number": self.account.account_number,
+				"installment_number": 1,
+				"narration": "Manual first installment payment.",
+			},
+			format="json",
+		)
+		self.assertEqual(repayment_response.status_code, 200)
+		installment.refresh_from_db()
+		loan.refresh_from_db()
+		self.account.refresh_from_db()
+		self.assertTrue(installment.is_paid)
+		self.assertEqual(self.account.balance, Decimal("220000.00") - installment.total_due)
+		self.assertEqual(loan.outstanding_principal, Decimal("120000.00") - installment.principal_due)
+		self.assertTrue(
+			SavingsTransaction.objects.filter(
+				account=self.account,
+				transaction_type=SavingsTransaction.WITHDRAWAL,
+				amount=installment.total_due,
 			).exists()
 		)
 

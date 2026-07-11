@@ -65,6 +65,8 @@ export interface EligibilitySummary {
   active_loans: number;
   outstanding_balance: number;
   estimated_monthly_installment: number;
+  estimated_total_interest: number;
+  estimated_total_repayable: number;
   two_thirds_salary_limit: number | null;
   total_guaranteed: number;
   warnings: Array<{ code: string; message: string }>;
@@ -107,6 +109,32 @@ export interface LoanApplication extends LoanApplicationListItem {
     outstanding_balance: number;
   };
   audit_log: Array<{ event: string; at: string | null; by: string | null }>;
+  loan_account: LoanAccount | null;
+}
+
+export interface LoanInstallment {
+  installment_number: number;
+  due_date: string;
+  principal_due: number;
+  interest_due: number;
+  total_due: number;
+  is_paid: boolean;
+  paid_at: string | null;
+  paid_by_username: string | null;
+}
+
+export interface LoanAccount {
+  loan_number: string;
+  principal_amount: number;
+  interest_rate: number;
+  interest_type: "reducing" | "flat";
+  term_months: number;
+  status: string;
+  outstanding_principal: number;
+  outstanding_interest: number;
+  outstanding_balance: number;
+  total_repayable: number;
+  schedule: LoanInstallment[];
 }
 
 export interface LoanApplicationPayload {
@@ -167,6 +195,8 @@ export const loansService = {
     api.post(`/loans/${applicationNumber}/reject/`, { rejection_reason }) as Promise<LoanApplication>,
   disburse: (applicationNumber: string, account_number: string, disbursement_notes: string) =>
     api.post(`/loans/${applicationNumber}/disburse/`, { account_number, disbursement_notes }) as Promise<LoanApplication>,
+  repay: (applicationNumber: string, account_number: string, installment_number: number, narration: string) =>
+    api.post(`/loans/${applicationNumber}/repay/`, { account_number, installment_number, narration }) as Promise<LoanApplication>,
   addGuarantor: (applicationNumber: string, member: string, guaranteed_amount: number) =>
     api.post(`/loans/${applicationNumber}/guarantors/`, { member, guaranteed_amount }) as Promise<Guarantor>,
   removeGuarantor: (applicationNumber: string, guarantorId: number) =>

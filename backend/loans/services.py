@@ -1,4 +1,6 @@
-from decimal import Decimal
+from calendar import monthrange
+from datetime import date
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.conf import settings
 from django.db import transaction
@@ -8,7 +10,7 @@ from django.utils import timezone
 from accounts.models import SavingsTransaction
 from accounts.services import post_savings_transaction
 
-from .models import LoanAccount, LoanApplication, LoanProduct, LoanTransaction
+from .models import LoanAccount, LoanApplication, LoanProduct, LoanSchedule, LoanTransaction
 
 
 MINIMUM_MEMBERSHIP_MONTHS = getattr(settings, "LOAN_MINIMUM_MEMBERSHIP_MONTHS", 3)
@@ -16,6 +18,100 @@ MINIMUM_MONTHLY_CONTRIBUTION = Decimal(
     str(getattr(settings, "LOAN_MINIMUM_MONTHLY_CONTRIBUTION", "0.00"))
 )
 DEFAULT_LOAN_MULTIPLIER = Decimal("3.00")
+MONEY = Decimal("0.01")
+
+
+def _money(value):
+    return Decimal(value).quantize(MONEY, rounding=ROUND_HALF_UP)
+
+
+def _add_months(value: date, months: int) -> date:
+    month = value.month - 1 + months
+    year = value.year + month // 12
+    month = month % 12 + 1
+    return date(year, month, min(value.day, monthrange(year, month)[1]))
+
+
+def create_repayment_schedule(*, loan: LoanAccount):
+    """Create monthly installments using the product's configured interest method."""
+    principal, months = loan.principal_amount, loan.term_months
+    annual_rate = loan.interest_rate / Decimal("100")
+    rows = []
+
+    if loan.product.interest_type == LoanProduct.FLAT:
+        total_interest = _money(principal * annual_rate * Decimal(months) / Decimal("12"))
+        monthly_principal, monthly_interest = _money(principal / months), _money(total_interest / months)
+        principal_remaining, interest_remaining = principal, total_interest
+        for number in range(1, months + 1):
+            principal_due = principal_remaining if number == months else monthly_principal
+            interest_due = interest_remaining if number == months else monthly_interest
+            rows.append((principal_due, interest_due))
+            principal_remaining -= principal_due
+            interest_remaining -= interest_due
+    else:
+        monthly_rate = annual_rate / Decimal("12")
+        payment = _money(principal / months) if not monthly_rate else _money(
+            principal * monthly_rate / (Decimal("1") - (Decimal("1") + monthly_rate) ** -months)
+        )
+        principal_remaining = principal
+        for number in range(1, months + 1):
+            interest_due = _money(principal_remaining * monthly_rate)
+            principal_due = principal_remaining if number == months else _money(payment - interest_due)
+            rows.append((principal_due, interest_due))
+            principal_remaining -= principal_due
+
+    schedules = [
+        LoanSchedule(
+            loan=loan,
+            installment_number=number,
+            due_date=_add_months(loan.disbursed_at.date(), number),
+            principal_due=principal_due,
+            interest_due=interest_due,
+            total_due=_money(principal_due + interest_due),
+        )
+        for number, (principal_due, interest_due) in enumerate(rows, start=1)
+    ]
+    LoanSchedule.objects.bulk_create(schedules)
+    return schedules
+
+
+def post_installment_repayment(*, loan: LoanAccount, installment_number: int, account, user, narration=""):
+    """Debit a member account and settle exactly one scheduled installment."""
+    with transaction.atomic():
+        loan = LoanAccount.objects.select_for_update().get(pk=loan.pk)
+        if loan.status != LoanAccount.DISBURSED:
+            raise ValueError("Loan is not active.")
+        installment = LoanSchedule.objects.select_for_update().get(loan=loan, installment_number=installment_number)
+        if installment.is_paid:
+            raise ValueError("This installment has already been paid.")
+
+        payment = LoanTransaction.objects.create(
+            loan=loan,
+            transaction_type=LoanTransaction.REPAYMENT,
+            amount=installment.total_due,
+            reference=f"REPAY-{loan.loan_number}-{installment.installment_number}",
+            narration=narration or f"Installment {installment.installment_number} repayment",
+            performed_by=user,
+        )
+        post_savings_transaction(
+            account=account,
+            transaction_type=SavingsTransaction.WITHDRAWAL,
+            amount=installment.total_due,
+            user=user,
+            narration=narration or f"Loan {loan.loan_number} installment {installment.installment_number}",
+        )
+        installment.is_paid = True
+        installment.paid_at = timezone.now()
+        installment.paid_by = user
+        installment.payment_transaction = payment
+        installment.save(update_fields=["is_paid", "paid_at", "paid_by", "payment_transaction"])
+
+        loan.outstanding_principal = max(Decimal("0.00"), loan.outstanding_principal - installment.principal_due)
+        loan.outstanding_interest = max(Decimal("0.00"), loan.outstanding_interest - installment.interest_due)
+        if not loan.schedule.filter(is_paid=False).exists():
+            loan.status = LoanAccount.CLOSED
+        loan.save(update_fields=["outstanding_principal", "outstanding_interest", "status"])
+        return installment
 
 
 def _months_between(start_date, end_date):
@@ -45,8 +141,25 @@ def build_eligibility_summary(application: LoanApplication):
     total_guaranteed = application.guarantors.aggregate(total=Sum("guaranteed_amount")).get("total") or Decimal("0.00")
 
     estimated_monthly_installment = Decimal("0.00")
+    estimated_total_interest = Decimal("0.00")
+    estimated_total_repayable = application.requested_amount
     if application.repayment_period_months:
-        estimated_monthly_installment = application.requested_amount / Decimal(application.repayment_period_months)
+        months = application.repayment_period_months
+        annual_rate = application.loan_type.interest_rate / Decimal("100")
+        if application.loan_type.interest_type == LoanProduct.FLAT:
+            estimated_total_interest = _money(
+                application.requested_amount * annual_rate * Decimal(months) / Decimal("12")
+            )
+            estimated_total_repayable = application.requested_amount + estimated_total_interest
+            estimated_monthly_installment = _money(estimated_total_repayable / months)
+        else:
+            monthly_rate = annual_rate / Decimal("12")
+            estimated_monthly_installment = _money(application.requested_amount / months) if not monthly_rate else _money(
+                application.requested_amount * monthly_rate /
+                (Decimal("1") - (Decimal("1") + monthly_rate) ** -months)
+            )
+            estimated_total_repayable = estimated_monthly_installment * months
+            estimated_total_interest = estimated_total_repayable - application.requested_amount
 
     two_thirds_salary_limit = None
     if application.gross_salary:
@@ -105,6 +218,8 @@ def build_eligibility_summary(application: LoanApplication):
         "active_loans": active_loans.count(),
         "outstanding_balance": outstanding_balance,
         "estimated_monthly_installment": estimated_monthly_installment,
+        "estimated_total_interest": estimated_total_interest,
+        "estimated_total_repayable": estimated_total_repayable,
         "two_thirds_salary_limit": two_thirds_salary_limit,
         "total_guaranteed": total_guaranteed,
         "warnings": warnings,
@@ -161,6 +276,12 @@ def disburse_application(*, application: LoanApplication, account, user, notes="
             narration=notes or f"Loan disbursement to {account.account_number}",
             performed_by=user,
         )
+
+        schedule = create_repayment_schedule(loan=loan_account)
+        loan_account.outstanding_interest = sum(
+            (item.interest_due for item in schedule), Decimal("0.00")
+        )
+        loan_account.save(update_fields=["outstanding_interest"])
 
         application.status = LoanApplication.Status.DISBURSED
         application.disbursed_by = user

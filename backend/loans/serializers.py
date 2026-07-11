@@ -13,6 +13,7 @@ from .models import (
     LoanApplicationDocument,
     LoanApplicationGuarantor,
     LoanProduct,
+    LoanSchedule,
 )
 from .services import build_eligibility_summary
 
@@ -97,9 +98,24 @@ class LoanApplicationDocumentSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "uploaded_by", "uploaded_by_username", "uploaded_at"]
 
 
+class LoanScheduleSerializer(serializers.ModelSerializer):
+    paid_by_username = serializers.CharField(source="paid_by.username", read_only=True)
+
+    class Meta:
+        model = LoanSchedule
+        fields = [
+            "installment_number", "due_date", "principal_due", "interest_due", "total_due",
+            "is_paid", "paid_at", "paid_by_username",
+        ]
+
+
 class LoanAccountSerializer(serializers.ModelSerializer):
     member = serializers.CharField(source="member.membership_number", read_only=True)
     product = serializers.CharField(source="product.name", read_only=True)
+    interest_type = serializers.CharField(source="product.interest_type", read_only=True)
+    schedule = LoanScheduleSerializer(many=True, read_only=True)
+    total_repayable = serializers.SerializerMethodField()
+    outstanding_balance = serializers.SerializerMethodField()
 
     class Meta:
         model = LoanAccount
@@ -115,8 +131,18 @@ class LoanAccountSerializer(serializers.ModelSerializer):
             "status",
             "outstanding_principal",
             "outstanding_interest",
+            "outstanding_balance",
+            "total_repayable",
+            "interest_type",
+            "schedule",
             "created_at",
         ]
+
+    def get_total_repayable(self, obj):
+        return obj.principal_amount + sum((item.interest_due for item in obj.schedule.all()), Decimal("0.00"))
+
+    def get_outstanding_balance(self, obj):
+        return obj.outstanding_principal + obj.outstanding_interest
 
 
 class LoanApplicationListSerializer(serializers.ModelSerializer):
@@ -326,3 +352,39 @@ class LoanDisbursementSerializer(serializers.Serializer):
 
         self.context["account"] = account
         return value
+
+
+class LoanRepaymentSerializer(serializers.Serializer):
+    account_number = serializers.CharField(max_length=20)
+    installment_number = serializers.IntegerField(min_value=1)
+    narration = serializers.CharField(required=False, allow_blank=True, default="")
+
+    def validate(self, attrs):
+        application = self.context["application"]
+        loan = getattr(application, "loan_account", None)
+        if loan is None or loan.status != LoanAccount.DISBURSED:
+            raise serializers.ValidationError("This loan is not active.")
+
+        try:
+            account = SavingsAccount.objects.select_related("member", "product").get(
+                account_number=attrs["account_number"]
+            )
+        except SavingsAccount.DoesNotExist as exc:
+            raise serializers.ValidationError({"account_number": "Account does not exist."}) from exc
+        if not account.is_active:
+            raise serializers.ValidationError({"account_number": "Account is not active."})
+        if account.member_id != application.member_id:
+            raise serializers.ValidationError({"account_number": "Repayment account must belong to the loan member."})
+        if not account.product.allows_withdrawals:
+            raise serializers.ValidationError({"account_number": "Withdrawals are not allowed on this account."})
+
+        try:
+            installment = loan.schedule.get(installment_number=attrs["installment_number"])
+        except LoanSchedule.DoesNotExist as exc:
+            raise serializers.ValidationError({"installment_number": "Installment does not exist."}) from exc
+        if installment.is_paid:
+            raise serializers.ValidationError({"installment_number": "This installment has already been paid."})
+
+        self.context["loan"] = loan
+        self.context["account"] = account
+        return attrs
