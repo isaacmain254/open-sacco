@@ -1,216 +1,114 @@
-# SACCO management system using React and Django
+# Open SACCO
 
+Open SACCO is an open-source savings and credit cooperative (SACCO) management system. It provides a Django REST API and a React web application for member management, savings accounts, transactions, and loan applications.
 
-**Open SACCO** is a comprehensive SACCO management system designed to streamline operations for Savings and Credit Cooperative Organizations (SACCOs). The platform is built with a Django REST API backend and a React.js frontend, offering a seamless and user-friendly experience.
+For day-to-day operation, see the concise [User Guide](USER_GUIDE.md). This README is for contributors and maintainers.
 
----
+## What it includes
 
-## Features
+- Member profiles and KYC-related information
+- Savings products, member accounts, balances, deposits, and withdrawals
+- Transaction history and account-level activity
+- Loan products, draft applications, guarantors, documents, review, approval, rejection, and disbursement workflows
+- Role-based module access for administrators, managers, operations, finance, loan officers, and accountants
+- A live operations dashboard with savings, transaction, and loan insights
 
-- **Membership Management**: Register, manage, and update member information.
-- **Account Management**: Handle individual and group accounts, including deposits, withdrawals, and balances.
-- **Loans and Savings**: Manage loan applications, approvals, repayments, and savings contributions.
-- **Transactions**: Record and track all financial transactions.
-- **Dashboards**: Visualize data with dynamic charts and summaries for better decision-making.
-- **Authentication**: Secure user authentication and role-based access control.
-- **Custom Reports**: Generate reports tailored to organizational needs.
+## Stack
 
----
+- Backend: Python 3.13, Django 4.2, Django REST Framework, Simple JWT, PostgreSQL
+- Frontend: React 18, TypeScript, Vite, Tailwind CSS, TanStack Query/Table, Recharts
+- Local containers: Docker Compose
 
-## Technologies Used
+## Quick start with Docker
 
-### Backend
-- **Framework**: [Django REST Framework](https://www.django-rest-framework.org/)
-- **Database**: PostgreSQL (or your chosen database)
-- **Authentication**: Token-based authentication (e.g., JWT)
+Prerequisites: Docker and Docker Compose.
 
-### Frontend
-- **Library**: [React.js](https://reactjs.org/)
-- **State Management**: Context API or Redux
-- **UI Framework**: Tailwind CSS or Material-UI (if applicable)
+1. Create local environment files from the examples and replace all example secrets before sharing or deploying:
 
----
+   ```bash
+   cp backend/.env.example backend/.env
+   cp web-app/.env.example web-app/.env
+   ```
 
-## Installation and Setup
+2. Start the stack:
 
-### Prerequisites
-- Python 3.9+ and pip
-- Node.js 16+ and npm or yarn
-- PostgreSQL
-- Git
-- Docker and Docker Compose
+   ```bash
+   docker compose up --build
+   ```
 
-### Clone the Repository
-```bash
-git clone https://github.com/isaacmain254/open-sacco.git
-cd open-sacco
-```
+   The frontend is served at `http://localhost:3000`, the API at `http://localhost:8000/api/v1/`, and PostgreSQL is exposed on host port `5433`.
 
-### Run Locally with Docker Compose
-From the repository root, start the full stack with:
+3. Optionally load safe-to-discard demo data:
 
-```bash
-docker compose up --build
-```
+   ```bash
+   docker compose exec backend python manage.py seed_demo_data
+   ```
 
-This will start:
-- PostgreSQL on http://localhost:5432
-- The Django backend on http://localhost:8000
-- The React frontend on http://localhost:3000
-
-Make sure the environment files exist before starting the stack:
-- backend/.env
-- web-app/.env
+   The seed command creates an administrator account: `admin@example.com` / `admin12345`. Change this password immediately in any non-demo environment.
 
 Useful commands:
 
 ```bash
-# Stop the containers
 docker compose down
-
-# Rebuild and start again after code or dependency changes
-docker compose up --build
-
-# Run a Django management command inside the backend container
-docker compose exec backend python manage.py <command>
-```
-
-Example for creating a superuser:
-
-```bash
 docker compose exec backend python manage.py createsuperuser
+docker compose exec backend python manage.py test
 ```
 
-### Seed Demo Data
-The project includes a built-in demo data command that populates sample records for the main modules so the app can be explored immediately after setup.
+## Local development
 
-#### Option 1: Automatic setup with Docker Compose
-After the containers are running, seed the database with:
+Start PostgreSQL and configure `backend/.env` with the appropriate database host, port, name, user, and password.
 
 ```bash
-docker compose exec backend python manage.py seed_demo_data
-```
-
-This creates sample data for:
-- members and KYC-related records
-- customer and account records
-- savings products, accounts, and transactions
-- loan products, loan accounts, schedules, and transactions
-- an admin user with the email admin@example.com and password admin12345
-
-#### Option 2: Manual setup
-If you are running the backend directly instead of through Docker, run the same command after migrations:
-
-```bash
-python manage.py migrate
-python manage.py seed_demo_data
-```
-
-You can also create a superuser manually if you prefer:
-
-```bash
-python manage.py createsuperuser
-```
-
-### Manual Setup
-
-Manual setup is also possible if you prefer not to use Docker.
-
-Backend Setup
-Navigate to the backend folder:
-
-```bash
+# Backend
 cd backend
-```
-
-Create and activate a virtual environment:
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-Install dependencies:
-
-```bash
+python -m venv .venv
+source .venv/bin/activate              # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-Set up the database:
-
-Update settings.py with your database credentials.
-Run migrations:
-
-```bash
-python manage.py makemigrations
-```
-Then migrate to create the database:
-
-```bash
 python manage.py migrate
-```
-Run the development server:
-
-```bash
 python manage.py runserver
 ```
 
-Frontend Setup
-Navigate to the frontend folder:
+In another terminal:
+
+```bash
+# Frontend
+cd web-app
+npm install
+npm run dev
+```
+
+Validate frontend changes with:
 
 ```bash
 cd web-app
+npm run build
+npm run lint
 ```
 
-Install dependencies:
+## Project layout
 
-```bash
-npm install
+```text
+backend/     Django project, REST API, migrations, and business rules
+web-app/     React/Vite application
+compose.yaml Local development stack
+USER_GUIDE.md Short guide for SACCO staff
 ```
 
-Configure API endpoint:
+## API and access control
 
-Update the API base URL in the environment file (.env).
-Start the development server:
+The API is rooted at `/api/v1/` and uses JWT bearer authentication. The frontend obtains tokens through `/api/v1/auth/login` and refreshes them through `/api/v1/auth/refresh-token`.
 
-```bash
-npm start
-```
+Role permissions are enforced by the backend and reflected in the frontend navigation. Do not rely on a hidden frontend menu as an authorization boundary; add or update backend permission checks whenever a feature changes.
 
-Usage
-Access the app via http://localhost:3000 for the frontend.
-The API is accessible via http://localhost:8000 for backend routes.
+## Contributing
 
-Use the admin panel for administrative tasks:
-URL: http://localhost:8000/admin
-Create a superuser:
+1. Fork the repository and create a focused branch.
+2. Keep API, frontend types, and permission rules aligned.
+3. Run the relevant backend tests and `npm run build` before opening a pull request.
+4. Describe user-visible changes, migrations, environment changes, and test coverage in the pull request.
 
-```bash
-python manage.py createsuperuser
-```
-Contributing
-Contributions are welcome! Follow these steps to contribute:
+Please never commit real credentials, production database dumps, generated media, or access tokens. Use `.env.example` files for configuration templates.
 
-Fork the repository.
-Create a feature branch:
+## License
 
-```bash
-git checkout -b feature-name
-```
-
-Commit your changes and push to the branch:
-
-```bash
-git commit -m "Description of feature"
-git push origin feature-name
-```
-Create a pull request.
-
-License
-
-This project is licensed under the MIT License.
-
-Contact
-
-
-For inquiries or support, reach out to isaacmain254.
+This repository does not currently include a license file. Add an approved open-source license before distributing or accepting contributions under specific reuse terms.
