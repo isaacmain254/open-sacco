@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
   filters: string;
   onClick?: () => void;
   showSearch?: boolean;
+  searchPlaceholder?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -42,6 +43,7 @@ export function DataTable<TData, TValue>({
   filters,
   onClick,
   showSearch = true,
+  searchPlaceholder = "Search ...",
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const table = useReactTable({
@@ -74,7 +76,7 @@ export function DataTable<TData, TValue>({
           </Button>
         ) : null}
         {showSearch && <Input
-          placeholder="Search ..."
+          placeholder={searchPlaceholder}
           value={(table.getColumn(filters)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn(filters)?.setFilterValue(event.target.value)

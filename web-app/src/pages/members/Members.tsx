@@ -14,6 +14,21 @@ const columns: ColumnDef<MemberProps>[] = [
   {
     accessorKey: "membership_number",
     header: "Member Number",
+    filterFn: (row, _columnId, value) => {
+      const query = String(value || "").trim().toLowerCase();
+      if (!query) return true;
+      return [
+        row.original.membership_number,
+        row.original.first_name,
+        row.original.middle_name,
+        row.original.last_name,
+        row.original.national_id,
+        row.original.phone_number,
+        row.original.email,
+        row.original.kra_pin,
+        row.original.status,
+      ].some((field) => String(field || "").toLowerCase().includes(query));
+    },
     cell: ({ row }) => {
       return (
           <CopyToClipboard text={row.original.membership_number} to={`/members/view/${row.original.membership_number}`} />
@@ -87,7 +102,8 @@ const Members = () => {
         btnTitle="Create Member"
         data={members ?? []}
         columns={columns}
-        filters="national_id"
+        filters="membership_number"
+        searchPlaceholder="Search name, member number, ID, phone..."
       />
     </>
   );

@@ -16,8 +16,12 @@ const invalidateLoans = (queryClient: ReturnType<typeof useQueryClient>, applica
 export const useLoanTypes = () =>
   useQuery({ queryKey: ["loan-types"], queryFn: loansService.getLoanTypes });
 
-export const useLoans = (filters: LoanFilters = {}) =>
-  useQuery({ queryKey: ["loans", filters], queryFn: () => loansService.getLoans(filters) });
+export const useLoans = (filters: LoanFilters = {}, enabled = true) =>
+  useQuery({
+    queryKey: ["loans", filters],
+    queryFn: () => loansService.getLoans(filters),
+    enabled,
+  });
 
 export const useLoanDashboard = () =>
   useQuery({ queryKey: ["loan-dashboard"], queryFn: loansService.getDashboard });

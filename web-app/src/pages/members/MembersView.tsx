@@ -17,6 +17,8 @@ import Spinner from "@/components/Spinner";
 import { useGetMemberById } from "@/hooks/api/members";
 import { useGetMemberAccounts } from "@/hooks/api/accounts";
 import { useGetMemberTransactions } from "@/hooks/api/transactions";
+import { useLoans } from "@/hooks/api/loans";
+import { useUserProfileInfo } from "@/hooks/useUserProfile";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/ui/Modal";
@@ -24,11 +26,22 @@ import AddAccountForm from "@/components/accounts/AddAccountForm";
 import { TransactionForm } from "@/components/transactions/transactionForm";
 import LucideIcon from "@/components/LucideIcon";
 
+const loanStatusLabels: Record<string, string> = {
+  draft: "Draft",
+  submitted: "Submitted",
+  under_review: "Under review",
+  approved: "Approved",
+  rejected: "Rejected",
+  disbursed: "Disbursed",
+};
+
 const MembersView = () => {
   const [openAddAccountModal, setOpenAddAccountModal] = useState(false);
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const { memberId } = useParams();
+  const { profile } = useUserProfileInfo();
+  const canViewLoans = ["AD", "MA", "OP", "LO"].includes(profile?.role || "");
 
   // Get member details
   const { data: member, isLoading, error } = useGetMemberById(memberId!);
@@ -42,6 +55,8 @@ const MembersView = () => {
   // Get member transactions
   const { data: memberTransactions, isLoading: isMemberTransactionsLoading } =
     useGetMemberTransactions(memberId!);
+  const { data: memberLoans = [], isLoading: isMemberLoansLoading, error: memberLoansError } =
+    useLoans({ member: memberId || "" }, canViewLoans);
 
   // Show loading indicator when loading
   if (isLoading || isMemberAccountsLoading || isMemberTransactionsLoading)
@@ -315,44 +330,38 @@ const MembersView = () => {
           {/* Loan History */}
           <div className=" bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
             <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
-              <CardHeader className="flex flex-row items-center">
-                <CardTitle>Loan History</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between gap-3">
+                <div>
+                  <CardTitle>Loan Applications</CardTitle>
+                  <p className="mt-1 text-sm text-slate-500">Applications submitted for this member.</p>
+                </div>
+                {canViewLoans && <Link className="text-sm text-blue-700 underline" to="/loans/edit">New application</Link>}
               </CardHeader>
               <CardContent>
-                <Table>
+                {!canViewLoans ? <p className="text-sm text-slate-500">Loan applications are available to loan, operations, manager, and administrator roles.</p> : isMemberLoansLoading ? <div className="flex justify-center py-6"><Spinner /></div> : memberLoansError ? <p className="text-sm text-red-600">Unable to load this member’s loan applications.</p> : <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Account</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Balance</TableHead>
+                      <TableHead>Application</TableHead>
+                      <TableHead>Loan type</TableHead>
+                      <TableHead>Requested amount</TableHead>
+                      <TableHead>Applied</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {/* {customerLoans.length > 0 ? (
-                    customerLoans.slice(0, 10).map((loan) => (
-                      <TableRow key={loan.loan_id}>
-                        <TableCell>{loan.account}</TableCell>
-                        <TableCell>{loan.loan_type}</TableCell>
-                        <TableCell>
-                          ${loan.amount}
-                        </TableCell>
-                        <TableCell>
-                          ${loan.loan_balance}
-                        </TableCell>
-                        <TableCell>
-                          {loan.loan_status}
-                        </TableCell>
+                    {memberLoans.length ? memberLoans.map((loan) => (
+                      <TableRow key={loan.application_number}>
+                        <TableCell>{loan.application_number}</TableCell>
+                        <TableCell>{loan.loan_type_name}</TableCell>
+                        <TableCell>Ksh {Number(loan.requested_amount).toLocaleString()}</TableCell>
+                        <TableCell>{formatDate(loan.created_at)}</TableCell>
+                        <TableCell><span className={`rounded-full px-2 py-1 text-xs ${loan.status === "rejected" ? "bg-red-100 text-red-800" : loan.status === "approved" || loan.status === "disbursed" ? "bg-green-100 text-green-800" : "bg-slate-100 text-slate-700"}`}>{loanStatusLabels[loan.status] || loan.status}</span></TableCell>
+                        <TableCell><Link className="text-blue-700 underline" to={loan.status === "draft" ? `/loans/edit/${loan.application_number}` : `/loans/view/${loan.application_number}`}>{loan.status === "draft" ? "Edit" : "View"}</Link></TableCell>
                       </TableRow>
-                    ))
-                    ) : (
-                      <div className="text-center">
-                        <h1 className="text-2xl font-medium">No loans history</h1>
-                      </div>
-                    )} */}
+                    )) : <TableRow><TableCell colSpan={6} className="h-24 text-center text-slate-500">No loan applications found for this member.</TableCell></TableRow>}
                   </TableBody>
-                </Table>
+                </Table>}
               </CardContent>
             </Card>
           </div>

@@ -41,9 +41,10 @@ export const useGetMemberById = (memberId: string) => {
   });
 };
 
-export const useGetMembers = () => {
+export const useGetMembers = (enabled = true) => {
   return useQuery({
     queryKey: ["members"],
     queryFn: membersService.getMembers,
+    enabled,
   });
 }

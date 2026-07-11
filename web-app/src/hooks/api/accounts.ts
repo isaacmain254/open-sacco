@@ -1,10 +1,11 @@
 import { AccountProps, accountsService } from "@/services/accounts";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const useGetAccounts = () => {
+export const useGetAccounts = (enabled = true) => {
   return useQuery({
     queryKey: ["accounts"],
-    queryFn: accountsService.getAccounts
+    queryFn: accountsService.getAccounts,
+    enabled,
   });
 };
 

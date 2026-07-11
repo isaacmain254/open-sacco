@@ -28,5 +28,7 @@ export const transactionsService = {
 
   getMemberTransactions: (member_id: string) =>
     api.get(`/transactions/member/${member_id}`) as Promise<TransactionProps[]>,
-};
 
+  getAccountTransactions: (accountNumber: string) =>
+    api.get(`/transactions/account/${accountNumber}/`) as Promise<TransactionProps[]>,
+};

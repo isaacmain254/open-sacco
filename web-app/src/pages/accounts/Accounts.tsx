@@ -37,6 +37,17 @@ const Accounts = () => {
     {
       accessorKey: "account_number",
       header: "Account Number",
+      filterFn: (row, _columnId, value) => {
+        const query = String(value || "").trim().toLowerCase();
+        if (!query) return true;
+        return [
+          row.original.account_number,
+          row.original.member,
+          row.original.product,
+          String(row.original.balance),
+          row.original.is_active ? "active" : "inactive",
+        ].some((field) => field.toLowerCase().includes(query));
+      },
       cell: ({ row }) => {
         return (
           <CopyToClipboard text={row.original.account_number} to={`/accounts/view/${row.original.account_number}`} />
@@ -89,6 +100,7 @@ const Accounts = () => {
         data={accounts || []}
         columns={columns}
         filters="account_number"
+        searchPlaceholder="Search account, member, product, balance..."
       />
       <Modal
         isOpen={openAddAccountModal}

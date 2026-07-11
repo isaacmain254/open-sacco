@@ -32,9 +32,10 @@ const formSchema = z.object({
 
 export interface TransactionFormProps {
   accountNo?: string;
+  onSuccess?: () => void;
 }
 
-export const TransactionForm = ({ accountNo }: TransactionFormProps) => {
+export const TransactionForm = ({ accountNo, onSuccess }: TransactionFormProps) => {
   const { mutate  } = usePostTransaction();
 
   const navigate = useNavigate();
@@ -59,7 +60,8 @@ export const TransactionForm = ({ accountNo }: TransactionFormProps) => {
       onSuccess: () => {
         form.reset();
         toast.success("Transaction completed successfully");
-        navigate(`/transactions`);
+        if (onSuccess) onSuccess();
+        else navigate(`/transactions`);
       },
       onError: () => {
         toast.error("Transaction failed");

@@ -19,7 +19,7 @@ const App: FC = () => {
       />
       <div className="mt-16 min-h-0 flex-1 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-0">
         <div className="hidden h-full overflow-y-auto border-r border-slate-200 bg-slate-100/95 p-4 dark:border-slate-800 dark:bg-slate-900/90 lg:block">
-          <ul className="list-none p-0 m-0">
+          <ul className="flex h-full flex-col list-none p-0 m-0">
             <SidebarLinks />
           </ul>
         </div>
