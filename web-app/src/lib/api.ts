@@ -73,6 +73,13 @@ api.interceptors.request.use(
       return config;
     }
 
+    // FormData must not inherit the JSON default above. Removing the header
+    // lets the browser provide multipart/form-data together with its required
+    // boundary, allowing Django REST Framework to populate request.FILES.
+    if (typeof FormData !== "undefined" && config.data instanceof FormData) {
+      config.headers.delete("Content-Type");
+    }
+
     // Client-side execution check
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("accessToken");

@@ -122,6 +122,7 @@ class LoanAccountSerializer(serializers.ModelSerializer):
 class LoanApplicationListSerializer(serializers.ModelSerializer):
     member_name = serializers.SerializerMethodField()
     member_number = serializers.CharField(source="member.membership_number", read_only=True)
+    member_national_id = serializers.CharField(source="member.national_id", read_only=True)
     loan_type_name = serializers.CharField(source="loan_type.name", read_only=True)
     loan_officer = serializers.CharField(source="created_by.username", read_only=True)
     approver = serializers.CharField(source="approved_by.username", read_only=True)
@@ -132,6 +133,7 @@ class LoanApplicationListSerializer(serializers.ModelSerializer):
             "application_number",
             "member",
             "member_number",
+            "member_national_id",
             "member_name",
             "loan_type",
             "loan_type_name",

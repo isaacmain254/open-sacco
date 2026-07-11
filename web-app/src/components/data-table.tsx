@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   btnTitle?: string;
   filters: string;
   onClick?: () => void;
+  showSearch?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -40,6 +41,7 @@ export function DataTable<TData, TValue>({
   title,
   filters,
   onClick,
+  showSearch = true,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const table = useReactTable({
@@ -55,30 +57,30 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="flex min-h-[calc(100dvh-4rem)] flex-col">
-      <h1 className="text-2xl font-medium">{title}</h1>
+    <div className="flex flex-col">
+      {title && <h1 className="text-2xl font-medium">{title}</h1>}
       <div className="flex flex-col md:flex-row justify-between items-center py-5 gap-y-4">
-        {route ? (
+        {route && btnTitle ? (
           <Link className="self-start" to={route ? route : ""}>
             <Button className="flex gap-x-2">
               <CirclePlus size={18} />
               {btnTitle}
             </Button>
           </Link>
-        ) : (
+        ) : btnTitle ? (
            <Button className="flex gap-x-2" onClick={onClick}>
             <CirclePlus size={18} />
             {btnTitle}
           </Button>
-        )}
-        <Input
+        ) : null}
+        {showSearch && <Input
           placeholder="Search ..."
           value={(table.getColumn(filters)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn(filters)?.setFilterValue(event.target.value)
           }
           className="w-64 self-start md:self-auto"
-        />
+        />}
       </div>
       <div className="rounded-md border">
         <Table>
@@ -131,7 +133,7 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       {/* Pagination starts here */}
-      <div className="mt-auto flex flex-col items-center justify-between gap-3 py-5 md:flex-row">
+      <div className="flex flex-col items-center justify-between gap-3 py-5 md:flex-row">
         <div className="space-x-3">
           <button
             className="border rounded p-2"

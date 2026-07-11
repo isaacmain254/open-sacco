@@ -17,7 +17,7 @@ const App: FC = () => {
         showMobileMenu={showMobileMenu}
         handleMobileMenuToggle={handleMobileMenuToggle}
       />
-      <div className="mt-16 flex-1 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-0">
+      <div className="mt-16 min-h-0 flex-1 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-0">
         <div className="hidden h-full overflow-y-auto border-r border-slate-200 bg-slate-100/95 p-4 dark:border-slate-800 dark:bg-slate-900/90 lg:block">
           <ul className="list-none p-0 m-0">
             <SidebarLinks />
@@ -33,7 +33,7 @@ const App: FC = () => {
           </div>
         )}
       
-        <div className="h-full overflow-y-auto px-3 py-3 pb-16 sm:px-4 lg:px-6 xl:px-8">
+        <div className="h-full min-h-0 overflow-y-auto px-3 py-3 pb-16 sm:px-4 lg:px-6 xl:px-8">
           <Outlet />
         </div>
       </div>
