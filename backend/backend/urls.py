@@ -25,9 +25,10 @@ urlpatterns = [
     path('api/v1/auth', include('rest_framework.urls', namespace='rest_framework')),
     path('api/v1/', include('members.urls')),
     path('api/v1/', include('accounts.urls')),
+    path('api/v1/', include('loans.urls')),
     # Keeps the established customer and loan APIs available while the loan UI is built.
     # Accounts and transactions above take precedence over the legacy routes with the
-    # same names; /customers/ and /loans/ are unique.
+    # same names; /customers/ remains unique while /loans/ is now owned by the loans app.
     path('api/v1/', include('customers.urls')),
 ]
 if settings.DEBUG:

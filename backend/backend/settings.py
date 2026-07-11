@@ -232,6 +232,15 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
+# Loan eligibility settings. These are warnings for staff review, never an
+# automatic rejection of a loan application.
+LOAN_MINIMUM_MEMBERSHIP_MONTHS = int(
+    os.getenv("LOAN_MINIMUM_MEMBERSHIP_MONTHS", "3")
+)
+LOAN_MINIMUM_MONTHLY_CONTRIBUTION = os.getenv(
+    "LOAN_MINIMUM_MONTHLY_CONTRIBUTION", "0.00"
+)
+
 AUTH_USER_MODEL = "users.User"
 # No append slash at the end of URL
 # APPEND_SLASH = True
