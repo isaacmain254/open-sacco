@@ -84,7 +84,7 @@ export function DataTable<TData, TValue>({
           className="w-64 self-start md:self-auto"
         />}
       </div>
-      <div className="rounded-md border">
+      <div>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -138,28 +138,28 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-col items-center justify-between gap-3 py-5 md:flex-row">
         <div className="space-x-3">
           <button
-            className="border rounded p-2"
+            className="rounded-md border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-blue-950/30"
             onClick={() => table.firstPage()}
             disabled={!table.getCanPreviousPage()}
           >
             {"<<"}
           </button>
           <button
-            className="border rounded p-2"
+            className="rounded-md border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-blue-950/30"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             {"<"}
           </button>
           <button
-            className="border rounded p-2"
+            className="rounded-md border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-blue-950/30"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             {">"}
           </button>
           <button
-            className="border rounded p-2"
+            className="rounded-md border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-blue-950/30"
             onClick={() => table.lastPage()}
             disabled={!table.getCanNextPage()}
           >
@@ -185,7 +185,7 @@ export function DataTable<TData, TValue>({
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
                 table.setPageIndex(page);
               }}
-              className="border p-1 rounded w-16 dark:bg-blue-900"
+              className="w-16 rounded-md border border-slate-200 bg-white p-1 text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
             />
           </span>
 
@@ -194,7 +194,7 @@ export function DataTable<TData, TValue>({
             onChange={(e) => {
               table.setPageSize(Number(e.target.value));
             }}
-            className="dark:bg-blue-900 rounded-md px-1"
+            className="rounded-md border border-slate-200 bg-white px-2 py-1 text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
           >
             {[10, 25, 50, 75, 100].map((pageSize) => (
               <option key={pageSize} value={pageSize}>

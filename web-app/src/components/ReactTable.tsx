@@ -67,17 +67,17 @@ const ReactTable = () => {
     
       
   return (
-    <div className="">
-      <table className="my-auto border">
-        <thead>
+    <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+      <table className="my-auto w-full text-sm">
+        <thead className="border-b border-slate-200 bg-slate-100/80 dark:border-slate-800 dark:bg-slate-900/80">
           {table.getHeaderGroups().map(headerGroup => (
             <tr
               key={headerGroup.id}
-              className="border-b text-gray-800 uppercase">
+              className="border-0 text-slate-600 dark:text-slate-300">
               {headerGroup.headers.map(header => (
                 <th
                   key={header.id}
-                  className="px-4 pr-2 py-4 font-medium text-left">
+                  className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -91,9 +91,9 @@ const ReactTable = () => {
         </thead>
         <tbody>
           {table.getRowModel().rows.map(row => (
-            <tr key={row.id} className="border-b">
+            <tr key={row.id} className="border-b border-slate-200/90 text-slate-700 transition-colors hover:bg-blue-50/60 dark:border-slate-800/90 dark:text-slate-200 dark:hover:bg-blue-950/30">
               {row.getVisibleCells().map(cell => (
-                <td key={cell.id} className="px-4 pt-[14px] pb-[18px]">
+                <td key={cell.id} className="px-4 py-3">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
