@@ -21,7 +21,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import RegisterSerializer, PasswordResetTRequestSerializer, PasswordResetSerializer, UserSerializer
+from .serializers import ChangePasswordSerializer, RegisterSerializer, PasswordResetTRequestSerializer, PasswordResetSerializer, UserSerializer
+from .permissions import HasUserManagementAccess, UserAccessPermission
 
 # from .serializers import PasswordResetConfirmSerializer, UserSerializer, RegisterSerializer, PasswordResetSerializer, ProfileSerializer
 # from .models import Profile
@@ -31,7 +32,17 @@ User = get_user_model()
 class UserViewList(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [UserAccessPermission]
+
+
+class CurrentUserView(generics.RetrieveUpdateAPIView):
+    """Authenticated user's profile, without exposing another user's record."""
+
+    serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
 
 # class UserProfileView(APIView):
@@ -63,7 +74,7 @@ class RegisterView(generics.CreateAPIView):
         - role (optional)
     """
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (HasUserManagementAccess,)
     serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
@@ -171,6 +182,25 @@ class PasswordResetView(generics.GenericAPIView):
         return Response(
             {"message": "Password reset successful"},
             status=status.HTTP_204_NO_CONTENT
+        )
+
+
+class ChangePasswordView(generics.GenericAPIView):
+    """Change the authenticated user's password after verifying the current one."""
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ChangePasswordSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        request.user.set_password(serializer.validated_data["new_password"])
+        request.user.save()
+
+        return Response(
+            {"message": "Password changed successfully"},
+            status=status.HTTP_200_OK,
         )
 
 

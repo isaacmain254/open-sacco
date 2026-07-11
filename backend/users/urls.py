@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import RegisterView, LogoutView, PasswordResetRequestView, PasswordResetView, UserViewList
+from .views import ChangePasswordView, CurrentUserView, RegisterView, LogoutView, PasswordResetRequestView, PasswordResetView, UserViewList
 
 router = DefaultRouter()
 router.register(r'users', UserViewList, basename='users')
@@ -20,6 +20,8 @@ urlpatterns = [
          name='request_password_reset'),
     path('password-reset',
          PasswordResetView.as_view(), name='password_reset'),
+    path('change-password', ChangePasswordView.as_view(), name='change_password'),
+    path('me', CurrentUserView.as_view(), name='current_user'),
     # path('api/profile/', UserProfileView.as_view(), name='profile'),
 ]
 

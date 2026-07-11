@@ -32,8 +32,8 @@ class User(AbstractUser):
         null=True
     )
 
-    USERNAME_FIELD = 'email'   # 👈 login with email
-    REQUIRED_FIELDS = ['username']  # 👈 still required for superuser
+    USERNAME_FIELD = 'email'   #  login with email
+    REQUIRED_FIELDS = ['username']  #  still required for superuser
 
     def __str__(self):
         return self.email

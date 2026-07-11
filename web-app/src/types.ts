@@ -11,12 +11,15 @@
 
 export type Profile = {
   role_display: string;
-  profile_image: File;
+  profile_image: string | File | null;
 };
 export type UserProps = {
+  id?: number | string;
   username: string;
   email: string;
-  profile: Profile;
+  role?: string;
+  profile_image?: string | File | null;
+  profile?: Profile | null;
 };
 
 export type AccountProps = {

@@ -31,6 +31,11 @@ export interface PasswordResetPayload {
   password: string;
 }
 
+export interface ChangePasswordPayload {
+  current_password: string;
+  new_password: string;
+}
+
 export interface GenericResponse {
   message?: string;
   success?: boolean;
@@ -58,4 +63,7 @@ export const authService = {
 
   passwordReset: (data: PasswordResetPayload) =>
     api.post("/auth/password-reset", data) as Promise<GenericResponse>,
+
+  changePassword: (data: ChangePasswordPayload) =>
+    api.post("/auth/change-password", data) as Promise<GenericResponse>,
 };

@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import {
   authService,
+  ChangePasswordPayload,
   LoginPayload,
   PasswordResetPayload,
   RefreshTokenPayload,
@@ -50,6 +51,12 @@ export const usePasswordReset = () => {
     onSuccess: (data) => {
       return data;
     },
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: (data: ChangePasswordPayload) => authService.changePassword(data),
   });
 };
 

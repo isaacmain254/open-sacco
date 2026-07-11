@@ -13,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "email", "role", "profile_image", "username"]
+        read_only_fields = ["role"]
 
 # class UserProfileSerializer(serializers.ModelSerializer):
 #     role_display = serializers.SerializerMethodField()
@@ -70,15 +71,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email']
-        )
-
-        user.set_password(validated_data['password'])
-        user.save()
-
-        return user
+        validated_data.pop("confirm_password")
+        password = validated_data.pop("password")
+        return User.objects.create_user(password=password, **validated_data)
 
 
 class PasswordResetTRequestSerializer(serializers.Serializer):
@@ -93,6 +88,21 @@ class PasswordResetSerializer(serializers.Serializer):
         validators=[validate_password],
         write_only=True
     )
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(
+        min_length=8,
+        validators=[validate_password],
+        write_only=True,
+    )
+
+    def validate_current_password(self, value):
+        user = self.context["request"].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Current password is incorrect.")
+        return value
 
 
 # class ProfileSerializer(serializers.ModelSerializer):

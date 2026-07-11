@@ -9,8 +9,19 @@ import "./index.css";
 
 import { router } from "./routes/index.tsx";
 
-// Create a query client
-const queryClient = new QueryClient();
+// Keep displayed tables current across navigation, focus changes, and updates
+// made by other staff members. Mutations below still invalidate immediately.
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 15_000,
+      refetchOnMount: true,
+      refetchOnWindowFocus: "always",
+      refetchOnReconnect: "always",
+      refetchInterval: 30_000,
+    },
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
