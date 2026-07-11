@@ -16,10 +16,14 @@ from pathlib import Path
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-from dotenv import load_dotenv  
+try:
+    from dotenv import load_dotenv
+except Exception:  # pragma: no cover - deployment resilience
+    load_dotenv = None
 
-# This loads your .env file into os.environ
-load_dotenv(BASE_DIR / '.env')
+# Load .env for local/dev only when python-dotenv is available.
+if load_dotenv is not None:
+    load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,16 +31,24 @@ load_dotenv(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-k87*u8p&=#9_sf3b#q-h-hj-ds4^7yjl)!eq+e%lu2u)jcdnx$'
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY", "django-insecure-local-development-fallback"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG=True
 DEBUG = bool(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = ["*"]
-# 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a , between each.
-# For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1,[::1]'
-# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
+# Keep explicit defaults for production domains, and allow env override.
+# Example: DJANGO_ALLOWED_HOSTS=isaactech.pythonanywhere.com,localhost,127.0.0.1
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "isaactech.pythonanywhere.com,localhost,127.0.0.1,[::1]",
+    ).split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -177,10 +189,28 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
-CORS_ALLOWED_ORIGINS = [
+DEFAULT_CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://open-sacco.vercel.app"
+    "https://open-sacco.vercel.app",
+]
+
+env_cors_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "")
+if env_cors_origins.strip():
+    CORS_ALLOWED_ORIGINS = [
+        origin.strip() for origin in env_cors_origins.split(",") if origin.strip()
+    ]
+else:
+    CORS_ALLOWED_ORIGINS = DEFAULT_CORS_ALLOWED_ORIGINS
+
+# Required for unsafe methods (POST/PUT/PATCH/DELETE) when CSRF checks are in play.
+CSRF_TRUSTED_ORIGINS = [
+    "https://open-sacco.vercel.app",
+]
+
+# Covers Vercel preview deployments like https://open-sacco-git-branch.vercel.app
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
 ]
 
 REST_FRAMEWORK = {
