@@ -35,9 +35,15 @@ const DashBoard = () => {
   // const { data: transactions } = useDataFetch<TransactionProps>("transactions");
   // const { data: loans } = useDataFetch<LoanProps>("loans");
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <Card x-chunk="dashboard-01-chunk-1">
+    <div className="flex flex-1 flex-col gap-6 px-1 py-2 md:gap-8 lg:px-0">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">Dashboard</h1>
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          Track members, balances, transactions, and loan activity from one place.
+        </p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card className="border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900" x-chunk="dashboard-01-chunk-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Customers</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -49,7 +55,7 @@ const DashBoard = () => {
             </p>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-0">
+        <Card className="border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900" x-chunk="dashboard-01-chunk-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Account Balance
@@ -63,7 +69,7 @@ const DashBoard = () => {
             </p>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-2">
+        <Card className="border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900" x-chunk="dashboard-01-chunk-2">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Amount Withdrawn
@@ -77,7 +83,7 @@ const DashBoard = () => {
             </p>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-3">
+        <Card className="border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900" x-chunk="dashboard-01-chunk-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Loans</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -90,8 +96,8 @@ const DashBoard = () => {
           </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)] xl:gap-6">
+        <Card className="border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900" x-chunk="dashboard-01-chunk-4">
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>Transactions</CardTitle>
@@ -127,7 +133,7 @@ const DashBoard = () => {
             </Table>
           </CardContent>
         </Card>
-        <Card x-chunk="dashboard-01-chunk-5">
+        <Card className="border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900" x-chunk="dashboard-01-chunk-5">
           <CardHeader >
             <CardTitle>Recent Loans</CardTitle>          
           </CardHeader>

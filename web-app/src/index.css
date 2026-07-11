@@ -20,6 +20,23 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-200;
+    font-family: "Roboto Condensed", sans-serif;
+  }
+
+  html.dark body {
+    @apply bg-slate-950 text-slate-100;
+  }
 }
 
 .spinner {

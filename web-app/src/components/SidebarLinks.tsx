@@ -92,15 +92,17 @@ const SidebarLinks: FC<SidebarLinksProps> = ({ onClick }) => {
           <NavLink
             to={item.to}
             onClick={onClick}
-            // TODO: check isActive on light mode, currently only works on dark mode
             className={({ isActive }) =>
-              `flex gap-x-3 bg-white py-2 px-3 text-base text-slate-800 rounded-md hover:bg-slate-950/25 hover:text-white transition duration-300 ease-in-out  dark:bg-blue-500/25 dark:text-slate-300 dark:hover:bg-blue-500/75
-                   ${isActive ? " dark:bg-blue-500/75 dark:text-white" : ""}`
+              `flex gap-x-3 rounded-xl border border-transparent px-3 py-2 text-base transition duration-200 ease-in-out ${
+                isActive
+                  ? "bg-blue-600 text-white shadow-sm dark:bg-blue-500 dark:text-white"
+                  : "bg-white text-slate-800 hover:bg-slate-200/80 hover:text-slate-950 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-50"
+              }`
             }
           >
             <LucideIcon name={item.icon} /> {item.label}
           </NavLink>
-          <div className=" w-full border border-slate-100 dark:border-blue-600 my-5 max-md:my-3"></div>
+          <div className="my-4 w-full border-t border-slate-200 dark:border-slate-800 max-md:my-3"></div>
         </li>
       ))}
     </>

@@ -73,7 +73,7 @@ const NavBar: FC<NavBarProps> = ({
     console.log("Logged out")
   };
   return (
-    <div className="w-full mx-auto fixed top-0 left-0  flex items-center justify-between  text-white bg-blue-700 h-16 dark:bg-blue-800 dark:text-slate-300 rounded-lg px-3 ">
+    <div className="fixed left-0 top-0 z-40 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-blue-700 px-3 text-white shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100">
       <div className="flex items-center">
         <img src={Logo} alt="Open SACCO logo" className="w-20 h-20" />
         <div
@@ -91,9 +91,9 @@ const NavBar: FC<NavBarProps> = ({
       <div className="flex gap-x-5 items-center">
         <div className="cursor-pointer" onClick={toggleDarkTheme}>
           {darkTheme ? (
-            <LucideIcon name="Moon" size={24} />
-          ) : (
             <LucideIcon name="Sun" size={24} />
+          ) : (
+            <LucideIcon name="Moon" size={24} />
           )}
         </div>
         <div>
@@ -109,25 +109,25 @@ const NavBar: FC<NavBarProps> = ({
             ref={dropdownRef}
             className={` ${
               showDropdown ? "block" : "hidden"
-            } bg-gray-200 text-black absolute z-20 mt-3 me-3 right-0 rounded-md dark:bg-blue-700 dark:text-white`}
+            } absolute right-0 z-20 mt-3 me-3 min-w-52 rounded-xl border border-slate-200 bg-white text-slate-900 shadow-lg dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100`}
           >
             <div className="p-4">
               <p className="">
                 {profile?.username}
-                <small className="bg-blue-700 dark:bg-blue-950 rounded-md text-white text-xs p-0.5">
+                <small className="rounded-md bg-blue-700 p-0.5 text-xs text-white dark:bg-slate-800">
                   {/* {profile?.profile.role_display} */}
                 </small>
               </p>
               <p className="pb-2">{profile?.email}</p>
               <Link
                 to="/profile"
-                className="flex hover:bg-blue-500/25 p-2  rounded-md dark:hover:bg-blue-500/75"
+                className="flex rounded-md p-2 hover:bg-slate-100 dark:hover:bg-slate-800"
                 onClick={handleShowDropdown}
               >
                 Profile
               </Link>
               <div
-                className="flex items-center text-sm gap-x-1 cursor-pointer hover:bg-blue-500/25 p-2 my-2 rounded-md dark:hover:bg-blue-500/75"
+                className="my-2 flex cursor-pointer items-center gap-x-1 rounded-md p-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800"
                 onClick={handleLogout}
               >
                 <LucideIcon name="LogOut" size={16} /> Logout

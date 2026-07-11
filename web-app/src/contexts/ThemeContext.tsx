@@ -18,22 +18,28 @@ export const ThemeContext = createContext<ThemeContextProps>(null!);
 export const ThemeContextProvider = ({ children }: ThemeProps) => {
   const [darkTheme, setDarkTheme] = useState<boolean>(() => {
     const saved = localStorage.getItem("darkMode");
-    const initialValue = JSON.parse(saved!);
-    return initialValue || false;
+    if (saved !== null) {
+      return JSON.parse(saved);
+    }
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
+
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkTheme));
-    const htmlClassList = document.querySelector("html")?.classList;
+    const htmlClassList = document.documentElement.classList;
     if (darkTheme) {
-      htmlClassList?.add("dark");
+      htmlClassList.add("dark");
     } else {
-      htmlClassList?.remove("dark");
+      htmlClassList.remove("dark");
     }
   }, [darkTheme]);
+
   // function to toggle dark theme
   const toggleDarkTheme = () => {
-    setDarkTheme(!darkTheme);
+    setDarkTheme((currentTheme) => !currentTheme);
   };
+
   return (
     <ThemeContext.Provider value={{ toggleDarkTheme, darkTheme }}>
       {children}
