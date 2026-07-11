@@ -21,6 +21,8 @@ services:
       - db
     env_file:
       - backend/.env
+    environment:
+      DATABASE_MODE: postgres
 
   web-app:
     build:

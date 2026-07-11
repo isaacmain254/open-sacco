@@ -95,34 +95,33 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+#
+# Local Python development should work without a running database service, so it
+# defaults to SQLite. Docker Compose sets DATABASE_MODE=postgres explicitly.
+# Set DATABASE_MODE=postgres locally only when you deliberately want to connect
+# to a locally running PostgreSQL instance.
+DATABASE_MODE = os.getenv("DATABASE_MODE", "sqlite").lower()
 
-# SQLITE DB
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-#   POSTGRES DB 
-DATABASES = {
-     'default': {
-         'ENGINE': 'django.db.backends.{}'.format(
-             os.getenv('DATABASE_ENGINE', 'sqlite3')
-         ),
-         'NAME': os.getenv('DATABASE_NAME', 'open-sacco-db'),
-         'USER': os.getenv('DATABASE_USERNAME', 'admin'),
-         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'password'),
-         'HOST': os.getenv('DATABASE_HOST', '127.0.0.1'),
-         'PORT': os.getenv('DATABASE_PORT', 5432),
-     }
- }
-
-# # Replace the SQLite DATABASES configuration with PostgreSQL:
-# DATABASES = {
-#     'default': dj_database_url.config(default='postgresql://admin:maina254@localhost:5432/open_sacco', conn_max_age=600)
-# }
+if DATABASE_MODE == "sqlite":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / os.getenv("SQLITE_DATABASE_NAME", "db.sqlite3"),
+        }
+    }
+elif DATABASE_MODE in {"postgres", "postgresql"}:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DATABASE_NAME", "open-sacco-db"),
+            "USER": os.getenv("DATABASE_USERNAME", "admin"),
+            "PASSWORD": os.getenv("DATABASE_PASSWORD", "password"),
+            "HOST": os.getenv("DATABASE_HOST", "127.0.0.1"),
+            "PORT": os.getenv("DATABASE_PORT", "5432"),
+        }
+    }
+else:
+    raise ValueError("DATABASE_MODE must be either 'sqlite' or 'postgres'.")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -175,8 +174,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'isaacmain72@gmail.com'
-EMAIL_HOST_PASSWORD = 'nnxp gcdl kyyn bagg'
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

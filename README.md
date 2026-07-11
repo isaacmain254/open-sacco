@@ -56,7 +56,7 @@ docker compose exec backend python manage.py test
 
 ## Local development
 
-Start PostgreSQL and configure `backend/.env` with the appropriate database host, port, name, user, and password.
+Local Python development uses SQLite automatically, so PostgreSQL and Docker are not required. Copy the environment example (or set `DATABASE_MODE=sqlite`) and run migrations; the database is stored at `backend/db.sqlite3` and is ignored by Git.
 
 ```bash
 # Backend
@@ -67,6 +67,8 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
+
+To use a locally running PostgreSQL instance instead, set `DATABASE_MODE=postgres` in `backend/.env` and provide the `DATABASE_NAME`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `DATABASE_HOST`, and `DATABASE_PORT` values. Docker Compose does this automatically.
 
 In another terminal:
 
