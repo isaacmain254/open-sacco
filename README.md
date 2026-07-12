@@ -19,6 +19,17 @@ For day-to-day operation, see the concise [User Guide](USER_GUIDE.md). This READ
 - Frontend: React 18, TypeScript, Vite, Tailwind CSS, TanStack Query/Table, Recharts
 - Local containers: Docker Compose
 
+## Try the hosted app
+
+You can test Open SACCO without a local setup at [open-sacco.vercel.app](https://open-sacco.vercel.app/). The deployed backend has already been migrated and seeded with demo data.
+
+Sign in with the seeded administrator account:
+
+- Email: `admin@example.com`
+- Password: `admin12345`
+
+This is a shared demo environment. Treat its data as disposable and do not enter real member or financial information.
+
 ## Quick start with Docker
 
 Prerequisites: Docker and Docker Compose.

@@ -80,7 +80,7 @@ const MembersView = () => {
       <div className="my-5 space-y-10 lg:space-y-0 lg:grid lg:grid-cols-12 gap-8">
         {/* LEFT SIDE */}
         <div className="col-span-3  space-y-8">
-          <div className="bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <h3 className="text-center font-semibold text-lg pb-2">
               Personal Details
             </h3>
@@ -144,7 +144,7 @@ const MembersView = () => {
             </div>
           </div>
           {/* EMPLOYMENT DETAILS */}
-          <div className="bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <h3 className="text-center font-semibold text-lg pb-2">
               Employment Details
             </h3>
@@ -185,7 +185,7 @@ const MembersView = () => {
               </span>
             </div>
           </div>
-          <div className="bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <h3 className="text-center font-semibold text-lg pb-2">
               Next Of Kin Details
             </h3>
@@ -214,8 +214,8 @@ const MembersView = () => {
         {/* RIGHT SIDE */}
         <div className="col-span-9 space-y-8">
           {/* Accounts */}
-          <div className=" bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
-            <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <Card className="border-0 bg-transparent shadow-none dark:border-0 dark:bg-transparent xl:col-span-2" x-chunk="dashboard-01-chunk-4">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Accounts</CardTitle>
                 <Button
@@ -256,8 +256,8 @@ const MembersView = () => {
                           <TableCell className="flex gap-6">
                             <LucideIcon
                               name="SquarePen"
-                              className="w-3 h-3 cursor-pointer"
-                              color="#3b3a3aff"
+                              color="currentColor"
+                              className="w-3 h-3 cursor-pointer text-slate-600 dark:text-slate-300"
                               onClick={() => {
                                 setOpenAddAccountModal(true);
                                 setSelectedAccount(account.account_number);
@@ -265,8 +265,8 @@ const MembersView = () => {
                             />
                             <LucideIcon
                               name="ArrowRightLeft"
-                              className="w-3 h-3 cursor-pointer"
-                              color="#3b3a3aff"
+                              color="currentColor"
+                              className="w-3 h-3 cursor-pointer text-slate-600 dark:text-slate-300"
                               onClick={() => {
                                 setOpenTransactionModal(true);
                                 setSelectedAccount(account.account_number);
@@ -286,8 +286,8 @@ const MembersView = () => {
             </Card>
           </div>
           {/* Transactions */}
-          <div className=" bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
-            <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <Card className="border-0 bg-transparent shadow-none dark:border-0 dark:bg-transparent xl:col-span-2" x-chunk="dashboard-01-chunk-4">
               <CardHeader className="flex flex-row items-center">
                 <CardTitle>Transactions History</CardTitle>
               </CardHeader>
@@ -328,17 +328,17 @@ const MembersView = () => {
             </Card>
           </div>
           {/* Loan History */}
-          <div className=" bg-gray-200/50 p-5 rounded-md dark:bg-blue-900">
-            <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            <Card className="border-0 bg-transparent shadow-none dark:border-0 dark:bg-transparent xl:col-span-2" x-chunk="dashboard-01-chunk-4">
               <CardHeader className="flex flex-row items-center justify-between gap-3">
                 <div>
                   <CardTitle>Loan Applications</CardTitle>
-                  <p className="mt-1 text-sm text-slate-500">Applications submitted for this member.</p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Applications submitted for this member.</p>
                 </div>
-                {canViewLoans && <Link className="text-sm text-blue-700 underline" to="/loans/edit">New application</Link>}
+                {canViewLoans && <Link className="text-sm text-blue-700 underline dark:text-blue-400" to="/loans/edit">New application</Link>}
               </CardHeader>
               <CardContent>
-                {!canViewLoans ? <p className="text-sm text-slate-500">Loan applications are available to loan, operations, manager, and administrator roles.</p> : isMemberLoansLoading ? <div className="flex justify-center py-6"><Spinner /></div> : memberLoansError ? <p className="text-sm text-red-600">Unable to load this member’s loan applications.</p> : <Table>
+                {!canViewLoans ? <p className="text-sm text-slate-500 dark:text-slate-400">Loan applications are available to loan, operations, manager, and administrator roles.</p> : isMemberLoansLoading ? <div className="flex justify-center py-6"><Spinner /></div> : memberLoansError ? <p className="text-sm text-red-600 dark:text-red-400">Unable to load this member’s loan applications.</p> : <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Application</TableHead>
@@ -356,10 +356,10 @@ const MembersView = () => {
                         <TableCell>{loan.loan_type_name}</TableCell>
                         <TableCell>Ksh {Number(loan.requested_amount).toLocaleString()}</TableCell>
                         <TableCell>{formatDate(loan.created_at)}</TableCell>
-                        <TableCell><span className={`rounded-full px-2 py-1 text-xs ${loan.status === "rejected" ? "bg-red-100 text-red-800" : loan.status === "approved" || loan.status === "disbursed" ? "bg-green-100 text-green-800" : "bg-slate-100 text-slate-700"}`}>{loanStatusLabels[loan.status] || loan.status}</span></TableCell>
-                        <TableCell><Link className="text-blue-700 underline" to={loan.status === "draft" ? `/loans/edit/${loan.application_number}` : `/loans/view/${loan.application_number}`}>{loan.status === "draft" ? "Edit" : "View"}</Link></TableCell>
+                        <TableCell><span className={`rounded-full px-2 py-1 text-xs ${loan.status === "rejected" ? "bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-200" : loan.status === "approved" || loan.status === "disbursed" ? "bg-green-100 text-green-800 dark:bg-green-950/60 dark:text-green-200" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200"}`}>{loanStatusLabels[loan.status] || loan.status}</span></TableCell>
+                        <TableCell><Link className="text-blue-700 underline dark:text-blue-400" to={loan.status === "draft" ? `/loans/edit/${loan.application_number}` : `/loans/view/${loan.application_number}`}>{loan.status === "draft" ? "Edit" : "View"}</Link></TableCell>
                       </TableRow>
-                    )) : <TableRow><TableCell colSpan={6} className="h-24 text-center text-slate-500">No loan applications found for this member.</TableCell></TableRow>}
+                    )) : <TableRow><TableCell colSpan={6} className="h-24 text-center text-slate-500 dark:text-slate-400">No loan applications found for this member.</TableCell></TableRow>}
                   </TableBody>
                 </Table>}
               </CardContent>

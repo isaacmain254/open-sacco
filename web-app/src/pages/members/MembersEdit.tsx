@@ -235,9 +235,9 @@ const MembersEdit = () => {
       <Form {...form}>
         <form className="space-y-16" onSubmit={form.handleSubmit(onSubmit)}>
           {/* Personal details */}
-          <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+          <div className="my-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <div className="w-full text-lg font-medium ">Personal Details</div>
-            <Separator className="my-4 bg-slate-400" />
+            <Separator className="my-4 bg-slate-200 dark:bg-slate-800" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               <FormField
                 control={form.control}
@@ -474,9 +474,9 @@ const MembersEdit = () => {
             </div>
           </div>
           {/* ADDRESS */}
-          <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+          <div className="my-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <div className="w-full text-lg font-medium ">Address</div>
-            <Separator className="my-4 bg-slate-400" />
+            <Separator className="my-4 bg-slate-200 dark:bg-slate-800" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               <FormField
                 control={form.control}
@@ -532,11 +532,11 @@ const MembersEdit = () => {
             </div>
           </div>
           {/* EMPLOYMENT DETAILS */}
-          <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+          <div className="my-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <div className="w-full text-lg font-medium ">
               Employment Details
             </div>
-            <Separator className="my-4 bg-slate-400" />
+            <Separator className="my-4 bg-slate-200 dark:bg-slate-800" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               <FormField
                 control={form.control}
@@ -652,9 +652,9 @@ const MembersEdit = () => {
             </div>
           </div>
           {/* Next Of Kin DETAILS */}
-          <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+          <div className="my-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <div className="w-full text-lg font-medium ">NextOfKin Details</div>
-            <Separator className="my-4 bg-slate-400" />
+            <Separator className="my-4 bg-slate-200 dark:bg-slate-800" />
             {fields.map((item, index) => (
               <div
                 key={item.id}
@@ -746,9 +746,9 @@ const MembersEdit = () => {
           </div>
 
           {/* KYC DOCUMENTS */}
-          <div className="bg-gray-200/50 my-5 p-5 rounded-md dark:bg-blue-900">
+          <div className="my-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
             <div className="w-full text-lg font-medium">KYC Documents</div>
-            <Separator className="my-4 bg-slate-400" />
+            <Separator className="my-4 bg-slate-200 dark:bg-slate-800" />
 
             {kycFields.map((item, index) => (
               <div
