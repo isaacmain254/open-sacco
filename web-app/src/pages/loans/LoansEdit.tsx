@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getApiErrorMessage } from "@/lib/utils";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -201,10 +202,11 @@ const LoansEdit = () => {
         : await createLoan.mutateAsync(toPayload(values));
       toast.success("Loan application saved as draft.");
       navigate(`/loans/edit/${loan.application_number}`, { replace: true });
-    } catch {
-      toast.error(
+    } catch (error) {
+      toast.error(getApiErrorMessage(
+        error,
         "Unable to save the loan application. Check the required fields and loan-type limits.",
-      );
+      ));
     }
   });
 
@@ -217,8 +219,8 @@ const LoansEdit = () => {
       await action.mutateAsync({ action: "submit", applicationNumber: loanId });
       toast.success("Loan application submitted for review.");
       navigate(`/loans/view/${loanId}`);
-    } catch {
-      toast.error("Unable to submit this application.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Unable to submit this application."));
     }
   };
 
@@ -237,8 +239,8 @@ const LoansEdit = () => {
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
       toast.success("Document uploaded.");
-    } catch {
-      toast.error("Unable to upload the document.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Unable to upload the document."));
     }
   };
 
@@ -257,8 +259,8 @@ const LoansEdit = () => {
       setGuarantorMember("");
       setGuaranteedAmount("");
       toast.success("Guarantor added.");
-    } catch {
-      toast.error("Unable to add this guarantor.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Unable to add this guarantor."));
     }
   };
 
@@ -267,8 +269,8 @@ const LoansEdit = () => {
     try {
       await guarantors.remove.mutateAsync({ applicationNumber: loanId, guarantorId });
       toast.success("Guarantor removed.");
-    } catch {
-      toast.error("Unable to remove this guarantor.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Unable to remove this guarantor."));
     }
   };
 

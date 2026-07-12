@@ -42,6 +42,8 @@ import {
   useGetMemberById,
   useUpdateMember,
 } from "@/hooks/api/members";
+import { membersService } from "@/services/members";
+import { getApiErrorMessage } from "@/lib/utils";
 
 // form validation - zod schemas
 const nextOfKinSchema = z.object({
@@ -69,13 +71,8 @@ const employmentSchema = z.object({
 });
 
 const kycDocumentSchema = z.object({
-  document_type: z.string().min(1, "Document type is required"),
-  file: z
-    .any()
-    .refine((file) => file instanceof File || file === null, {
-      message: "File is required",
-    })
-    .nullable(),
+  document_type: z.enum(["NATIONAL_ID", "PASSPORT_PHOTO", "SIGNATURE"]),
+  file: z.union([z.instanceof(File), z.string(), z.null()]),
   verified: z.boolean().default(false),
 });
 
@@ -88,8 +85,11 @@ const formSchema = z.object({
 
   national_id: z
     .string()
-    .min(8, "National ID is required")
-    .max(10, "National ID must be at most 10 digits"),
+    .trim()
+    .min(1, "National ID is required")
+    .min(6, "National ID must be at least 6 digits")
+    .max(10, "National ID must be at most 10 digits")
+    .regex(/^\d+$/, "National ID must contain digits only"),
 
   phone_number: z.string().min(1, "This field is required"),
 
@@ -98,7 +98,10 @@ const formSchema = z.object({
     .min(1, "This field is required")
     .email("Enter a valid email address"),
 
-  date_of_birth: z.string().min(1, "This field is required"),
+  date_of_birth: z
+    .string()
+    .min(1, "Date of birth is required")
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Use the format YYYY-MM-DD"),
 
   kra_pin: z.string().min(1, "This field is required"),
 
@@ -113,6 +116,13 @@ const formSchema = z.object({
   kyc_documents: z.array(kycDocumentSchema).optional(),
 });
 
+type MemberFormValues = z.infer<typeof formSchema>;
+type KycDocumentForm = z.infer<typeof kycDocumentSchema>;
+
+const isNewKycDocument = (
+  document: KycDocumentForm,
+): document is KycDocumentForm & { file: File } => document.file instanceof File;
+
 const MembersEdit = () => {
   const { memberId } = useParams();
   const navigate = useNavigate();
@@ -122,10 +132,10 @@ const MembersEdit = () => {
   // Get member details
   const { data: member, isLoading } = useGetMemberById(memberId!);
   // Create member mutation
-  const { mutate: createMember, isPending: isCreatingMember } =
+  const { mutateAsync: createMember, isPending: isCreatingMember } =
     useCreateMember();
   // Update member mutation
-  const { mutate: updateMember, isPending: isUpdatingMember } =
+  const { mutateAsync: updateMember, isPending: isUpdatingMember } =
     useUpdateMember();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -149,7 +159,6 @@ const MembersEdit = () => {
         employment_type: "EMPLOYED",
         employer_name: "",
         job_title: "",
-        monthly_income: 0,
         business_name: "",
         business_type: "",
       },
@@ -169,7 +178,7 @@ const MembersEdit = () => {
         employment: member.employment ?? form.getValues("employment"),
       });
     }
-  }, [member]);
+  }, [form, member]);
 
   const { control } = form;
 
@@ -187,40 +196,52 @@ const MembersEdit = () => {
     name: "kyc_documents",
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const payload: any = {
-      ...values,
-      next_of_kin: values.next_of_kin ?? [],
-      kyc_documents: values.kyc_documents ?? [],
+  const onSubmit = async (values: MemberFormValues) => {
+    const { kyc_documents = [], employment, ...memberDetails } = values;
+    const payload = {
+      ...memberDetails,
+      employment: {
+        ...employment,
+        monthly_income: employment.monthly_income ?? 0,
+      },
     };
 
-    if (memberId) {
-      updateMember(
-        { memberId, data: payload  },
-        {
-          onSuccess: () => {
-            toast.success("Member updated successfully");
-            navigate("/members");
-          },
-          onError: () => toast.error("Failed to update Member"),
-        },
-      );
-    } else {
-      createMember(payload, {
-        onSuccess: () => {
-          toast.success("Member created successfully");
-          if (continueAdding) {
-            form.reset();
-            navigate("/members/edit");
-          } else {
-            navigate("/members");
-          }
-        },
-        onError: () => toast.error("Failed to create members"),
-      });
+    try {
+      const savedMember = memberId
+        ? await updateMember({ memberId, data: payload })
+        : await createMember(payload);
+
+      const newDocuments = kyc_documents.filter(isNewKycDocument);
+      if (newDocuments.length) {
+        try {
+          await Promise.all(
+            newDocuments.map((document) =>
+              membersService.uploadKycDocument(
+                savedMember.membership_number,
+                document.document_type,
+                document.file,
+                document.verified,
+              ),
+            ),
+          );
+        } catch (error) {
+          toast.error(getApiErrorMessage(error, "Member saved, but one or more KYC documents could not be uploaded."));
+          return;
+        }
+      }
+
+      toast.success(memberId ? "Member updated successfully" : "Member created successfully");
+      if (!memberId && continueAdding) {
+        form.reset();
+        navigate("/members/edit");
+      } else {
+        navigate("/members");
+      }
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, memberId ? "Failed to update member" : "Failed to create member"));
     }
   };
-  console.log("continue editting", continueAdding);
+  const employmentType = form.watch("employment.employment_type");
 
   if (isLoading)
     return (
@@ -418,8 +439,10 @@ const MembersEdit = () => {
                     <FormLabel>Date of Birth</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="YYYY-MM-DD"
+                        type="date"
+                        max={new Date().toISOString().split("T")[0]}
                         {...field}
+                        value={field.value || ""}
                         className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
                       />
                     </FormControl>
@@ -564,91 +587,111 @@ const MembersEdit = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="employment.employer_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Employer Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Open Sacco"
-                        {...field}
-                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="employment.job_title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Job Title</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Accountant"
-                        {...field}
-                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="employment.monthly_income"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Monthly Income</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="KES 100,000"
-                        {...field}
-                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="employment.business_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Kinuthia Enterprises"
-                        {...field}
-                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="employment.business_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Type</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Retail"
-                        {...field}
-                        className="!focus-visible:ring-0 !focus-visible:ring-offset-0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {employmentType === "EMPLOYED" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="employment.employer_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Employer Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Open Sacco" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="employment.job_title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Job Title</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Accountant" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {employmentType === "SELF_EMPLOYED" && (
+                <FormField
+                  control={form.control}
+                  name="employment.job_title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Occupation</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Consultant" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {employmentType === "BUSINESS" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="employment.business_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Kinuthia Enterprises" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="employment.business_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Business Type</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Retail" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {employmentType !== "UNEMPLOYED" && (
+                <FormField
+                  control={form.control}
+                  name="employment.monthly_income"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Monthly Income</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="KES 100,000"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {employmentType === "UNEMPLOYED" && (
+                <p className="self-end text-sm text-slate-500 dark:text-slate-400">
+                  No employment details are required.
+                </p>
+              )}
             </div>
           </div>
           {/* Next Of Kin DETAILS */}
@@ -849,7 +892,7 @@ const MembersEdit = () => {
               className="inline-flex items-center gap-1.5 mt-3 cursor-pointer hover:underline"
               onClick={() =>
                 appendKyc({
-                  document_type: "",
+                  document_type: "NATIONAL_ID",
                   file: null,
                   verified: false,
                 })

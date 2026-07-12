@@ -11,6 +11,7 @@ import { useGetMembers } from "@/hooks/api/members";
 import { useGetMemberAccounts } from "@/hooks/api/accounts";
 import { useUserProfileInfo } from "@/hooks/useUserProfile";
 import { LoanInstallment, LoanStatus } from "@/services/loans";
+import { getApiErrorMessage } from "@/lib/utils";
 
 const labels: Record<LoanStatus, string> = { draft: "Draft", submitted: "Submitted", under_review: "Under review", approved: "Approved", rejected: "Rejected", disbursed: "Disbursed" };
 const money = (value: number | null | undefined) => Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -64,7 +65,7 @@ const LoansView = () => {
       await action.mutateAsync({ action: actionName, applicationNumber: loan.application_number, payload });
       toast.success(`Loan application ${actionName === "review" ? "moved to review" : `${actionName}d`} successfully.`);
       setModal(null); setNotes(""); setInstallmentNumber("");
-    } catch { toast.error("The workflow action could not be completed."); }
+    } catch (error) { toast.error(getApiErrorMessage(error, "The workflow action could not be completed.")); }
   };
 
   const addGuarantor = async () => {
@@ -72,7 +73,7 @@ const LoansView = () => {
     try {
       await guarantors.add.mutateAsync({ applicationNumber: loan.application_number, member: guarantorMember, guaranteedAmount: Number(guaranteedAmount) });
       setGuarantorMember(""); setGuarantorSearch(""); setGuaranteedAmount(""); toast.success("Guarantor added.");
-    } catch { toast.error("Unable to add this guarantor."); }
+    } catch (error) { toast.error(getApiErrorMessage(error, "Unable to add this guarantor.")); }
   };
 
   const uploadDocument = async (event: ChangeEvent<HTMLFormElement>) => {
@@ -81,7 +82,7 @@ const LoansView = () => {
     try {
       await documents.upload.mutateAsync({ applicationNumber: loan.application_number, documentType, file });
       setFile(null); event.currentTarget.reset(); toast.success("Document uploaded.");
-    } catch { toast.error("Unable to upload the document."); }
+    } catch (error) { toast.error(getApiErrorMessage(error, "Unable to upload the document.")); }
   };
 
   return (

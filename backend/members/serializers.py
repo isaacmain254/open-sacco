@@ -24,9 +24,11 @@ class KYCDocumentSerializer(serializers.ModelSerializer):
 
 
 class MemberSerializer(WritableNestedModelSerializer):
-    next_of_kin = NextOfKinSerializer(many=True)
+    next_of_kin = NextOfKinSerializer(many=True, required=False)
     employment = EmploymentDetailSerializer(many=False)
-    kyc_documents = KYCDocumentSerializer(many=True)
+    # Files are uploaded separately via the multipart KYC endpoint so member
+    # create and update requests can remain JSON.
+    kyc_documents = KYCDocumentSerializer(many=True, required=False)
 
     class Meta:
         model = Member

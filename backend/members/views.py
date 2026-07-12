@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Member
-from .serializers import MemberSerializer
+from .serializers import KYCDocumentSerializer, MemberSerializer
 from users.permissions import HasMemberAccess
 
 
@@ -38,3 +38,11 @@ class MemberViewSet(
     serializer_class = MemberSerializer
     permission_classes = [HasMemberAccess]
     lookup_field = "membership_number"
+
+    def upload_kyc_document(self, request, membership_number=None):
+        """Upload one KYC document using multipart form data."""
+        member = self.get_object()
+        serializer = KYCDocumentSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save(member=member)
+        return Response(serializer.data, status=201)

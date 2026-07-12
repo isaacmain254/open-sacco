@@ -3,6 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {  useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getApiErrorMessage } from "@/lib/utils";
 
 // components
 import {
@@ -105,8 +106,7 @@ export default function AddAccountForm({
             navigate(`/accounts`);
           },
           onError: (error) => {
-            console.log(error);
-            toast.error(error.message);
+            toast.error(getApiErrorMessage(error, "Unable to update account"));
           },
         },
       );
@@ -120,8 +120,8 @@ export default function AddAccountForm({
             navigate(`/accounts`);
           }
         },
-        onError: () => {
-          toast.error("An error occurred");
+        onError: (error) => {
+          toast.error(getApiErrorMessage(error, "Unable to create account"));
         },
       });
     }

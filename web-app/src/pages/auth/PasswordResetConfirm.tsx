@@ -9,6 +9,7 @@ import Spinner from "@/components/Spinner";
 import Button from "@/components/Button";
 // hooks
 import { usePasswordReset } from "@/hooks/api/auth";
+import { getApiErrorMessage } from "@/lib/utils";
 
 const PasswordResetConfirm: FC = () => {
   const [password, setPassword] = useState("");
@@ -35,8 +36,8 @@ const PasswordResetConfirm: FC = () => {
           toast.success(data.message, { autoClose: 2000 });
           navigate("/login");
         },
-        onError: () => {
-          toast.error("Error resetting password", { autoClose: 2000 });
+        onError: (error) => {
+          toast.error(getApiErrorMessage(error, "Unable to reset password"), { autoClose: 2000 });
         },
       },
     );

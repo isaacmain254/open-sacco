@@ -10,6 +10,7 @@ import { FormEvent, useState } from "react";
 import { toast } from "react-toastify";
 import { useChangePassword } from "@/hooks/api/auth";
 import LucideIcon from "@/components/LucideIcon";
+import { getApiErrorMessage } from "@/lib/utils";
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -50,11 +51,7 @@ const ChangePassword = () => {
           setConfirmPassword("");
         },
         onError: (error) => {
-          const message =
-            typeof error === "object" && error && "current_password" in error
-              ? String((error as { current_password?: string[] }).current_password?.[0])
-              : "Unable to change password";
-          toast.error(message, {
+          toast.error(getApiErrorMessage(error, "Unable to change password"), {
             autoClose: 3000,
           });
         },

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getApiErrorMessage } from "@/lib/utils";
 
 // components
 import {
@@ -71,7 +72,7 @@ const AccountsEdit = () => {
         is_active: account.is_active,
       });
     }
-  }, [account]);
+  }, [account, form]);
 
   // handle form submit
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -85,8 +86,8 @@ const AccountsEdit = () => {
         toast.success("Account created successfully");
         navigate("/accounts");
       },
-      onError: () => {
-        toast.error("An error occurred");
+      onError: (error) => {
+        toast.error(getApiErrorMessage(error, "Unable to create account"));
       },
     });
   };

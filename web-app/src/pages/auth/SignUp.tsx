@@ -11,6 +11,7 @@ import FormInput from "@/components/FormInput";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
 import { useRegister } from "@/hooks/api/auth";
+import { getApiErrorMessage } from "@/lib/utils";
 
 const SignUp: FC = () => {
   // TODO: manage input type and icon state independently and validate form input
@@ -42,9 +43,9 @@ const SignUp: FC = () => {
           toast.success("Account created successfully", { autoClose: 2000 });
           navigate("/login");
         },
-        onError: () => {
+        onError: (error) => {
           // setLoading(false);
-          toast.error("Error creating account", { autoClose: 2000 });
+          toast.error(getApiErrorMessage(error, "Unable to create account"), { autoClose: 2000 });
         },
       },
       )

@@ -11,6 +11,7 @@ import Spinner from "@/components/Spinner";
 import { toast } from "react-toastify";
 import { useLogin } from "@/hooks/api/auth";
 import { Auth } from "@/contexts/AuthContext";
+import { getApiErrorMessage } from "@/lib/utils";
 
 // interface LoginFormData{
 //   email: string;
@@ -35,8 +36,8 @@ const SignIn: FC = () => {
           login(data);
           toast.success("Login successful", { autoClose: 2000 });
         },
-        onError: () => {
-          toast.error("Error logging in", { autoClose: 2000 });
+        onError: (error) => {
+          toast.error(getApiErrorMessage(error, "Unable to log in"), { autoClose: 2000 });
         },
       },
     );

@@ -12,6 +12,7 @@ import Button from "@/components/Button";
 
 // Hooks
 import { useRequestPasswordReset } from "@/hooks/api/auth";
+import { getApiErrorMessage } from "@/lib/utils";
 
 const ForgotPassword: FC = () => {
   const [email, setEmail] = useState("");
@@ -30,8 +31,8 @@ const ForgotPassword: FC = () => {
           toast.success(data.message, { autoClose: 2000 });
           setEmail("");
         },
-        onError: () => {
-          toast.error("Error sending password reset email", {
+        onError: (error) => {
+          toast.error(getApiErrorMessage(error, "Unable to send password reset email"), {
             autoClose: 2000,
           });
         },

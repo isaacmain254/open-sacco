@@ -12,4 +12,5 @@ router = DefaultRouter()
 urlpatterns = [
     path('members/', MemberViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('members/<str:membership_number>/', MemberViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update' })),
+    path('members/<str:membership_number>/kyc-documents/', MemberViewSet.as_view({'post': 'upload_kyc_document'})),
 ]

@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import { TransactionProps } from "@/services/transactions";
+import { getApiErrorMessage } from "@/lib/utils";
 
 const formSchema = z.object({
   transaction_type: z.string().min(1, "Transaction type is required"),
@@ -63,8 +64,8 @@ export const TransactionForm = ({ accountNo, onSuccess }: TransactionFormProps) 
         if (onSuccess) onSuccess();
         else navigate(`/transactions`);
       },
-      onError: () => {
-        toast.error("Transaction failed");
+      onError: (error) => {
+        toast.error(getApiErrorMessage(error, "Transaction failed"));
       },
     });
   };

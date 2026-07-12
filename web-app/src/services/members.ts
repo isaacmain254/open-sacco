@@ -1,26 +1,26 @@
 import api from "@/lib/api";
 
 interface NextOfKin {
-  name: string;
-  relationship: string;
-  phone_number: string;
-  national_id: string;
+  name?: string;
+  relationship?: string;
+  phone_number?: string;
+  national_id?: string;
 }
 
 interface Employment {
   employment_type: "EMPLOYED" | "SELF_EMPLOYED" | "UNEMPLOYED" | "BUSINESS";
-  employer_name: string;
-  job_title: string;
-  monthly_income: number;
-  business_name: string;
-  business_type: string;
+  employer_name?: string;
+  job_title?: string;
+  monthly_income?: number;
+  business_name?: string;
+  business_type?: string;
 }
 
-interface KycDocument {
+export interface KycDocument {
   document_type: "NATIONAL_ID" | "PASSPORT_PHOTO" | "SIGNATURE";
   file: string;
   verified: boolean;
-  verified_by: string;
+  verified_by?: string;
 }
 
 export interface MemberProps {
@@ -54,4 +54,17 @@ export const membersService = {
 
   updateMember: (memberId: string, memberData: Partial<MemberProps>) =>
     api.put(`/members/${memberId}/`, memberData) as Promise<MemberProps>,
+
+  uploadKycDocument: (
+    memberId: string,
+    documentType: KycDocument["document_type"],
+    file: File,
+    verified: boolean,
+  ) => {
+    const data = new FormData();
+    data.append("document_type", documentType);
+    data.append("file", file);
+    data.append("verified", String(verified));
+    return api.post(`/members/${memberId}/kyc-documents/`, data) as Promise<KycDocument>;
+  },
 };
