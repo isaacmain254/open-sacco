@@ -33,15 +33,13 @@ class MemberSerializer(WritableNestedModelSerializer):
     class Meta:
         model = Member
         exclude = ("date_joined", "created_at", "updated_at")
-        # Fix  UniqueValidator error on national_id field on instance update
-        # Allow DRF to handle it automatically
         extra_kwargs = {
             'national_id': {
                 'validators': [
-                    # UniqueValidator(
-                    #     queryset=Member.objects.all(),
-                    #     message="A member with this national ID already exists."
-                    # )
+                    UniqueValidator(
+                        queryset=Member.objects.all(),
+                        message="A member with this national ID already exists.",
+                    )
                 ]
             }
         }

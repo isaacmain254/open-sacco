@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
@@ -127,7 +127,11 @@ const MembersEdit = () => {
   const { memberId } = useParams();
   const navigate = useNavigate();
 
-  const [continueAdding, setContinueAdding] = useState(false);
+  const [submissionAction, setSubmissionAction] = useState<
+    "save" | "continue" | null
+  >(null);
+  const submissionActionRef = useRef<"save" | "continue">("save");
+  const isSavingRef = useRef(false);
 
   // Get member details
   const { data: member, isLoading } = useGetMemberById(memberId!);
@@ -197,6 +201,10 @@ const MembersEdit = () => {
   });
 
   const onSubmit = async (values: MemberFormValues) => {
+    if (isSavingRef.current) return;
+    isSavingRef.current = true;
+    const action = memberId ? "save" : submissionActionRef.current;
+    setSubmissionAction(action);
     const { kyc_documents = [], employment, ...memberDetails } = values;
     const payload = {
       ...memberDetails,
@@ -231,17 +239,22 @@ const MembersEdit = () => {
       }
 
       toast.success(memberId ? "Member updated successfully" : "Member created successfully");
-      if (!memberId && continueAdding) {
+      if (!memberId && action === "continue") {
         form.reset();
-        navigate("/members/edit");
       } else {
         navigate("/members");
       }
     } catch (error) {
       toast.error(getApiErrorMessage(error, memberId ? "Failed to update member" : "Failed to create member"));
+    } finally {
+      isSavingRef.current = false;
+      submissionActionRef.current = "save";
+      setSubmissionAction(null);
     }
   };
   const employmentType = form.watch("employment.employment_type");
+  const isSubmitting =
+    form.formState.isSubmitting || isCreatingMember || isUpdatingMember;
 
   if (isLoading)
     return (
@@ -906,19 +919,31 @@ const MembersEdit = () => {
           <div className="w-full flex items-center justify-end gap-5">
             {!memberId && (
               <Button
+                type="submit"
                 variant="outline"
                 className="ml-2"
-                onClick={() => setContinueAdding(true)}
+                disabled={isSubmitting}
+                onClick={() => {
+                  submissionActionRef.current = "continue";
+                  setSubmissionAction("continue");
+                }}
               >
-                {isCreatingMember && continueAdding ? (
+                {isSubmitting && submissionAction === "continue" ? (
                   <Spinner />
                 ) : (
                   "Save & Continue"
                 )}
               </Button>
             )}
-            <Button type="submit">
-              {isCreatingMember || isUpdatingMember ? (
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              onClick={() => {
+                submissionActionRef.current = "save";
+                setSubmissionAction("save");
+              }}
+            >
+              {isSubmitting && submissionAction === "save" ? (
                 <Spinner />
               ) : memberId ? (
                 "Update"
