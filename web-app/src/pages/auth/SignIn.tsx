@@ -57,6 +57,17 @@ const SignIn: FC = () => {
       </div>
       <div className="lg:w-1/2 w-full">
         <div className="w-full h-full flex  flex-col  items-center justify-center">
+          <div className="mb-4 w-72 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-center text-xs text-amber-900 dark:border-amber-600 dark:bg-amber-950/50 dark:text-amber-200">
+            <p className="font-medium">Demo login</p>
+            <p>
+              <span className="font-mono">admin@example.com</span> /{" "}
+              <span className="font-mono">admin12345</span>
+            </p>
+            <p className="mt-1 text-amber-800 dark:text-amber-300">
+              Free demo server — use responsibly. Do not abuse the app or access
+              rights.
+            </p>
+          </div>
           <div className="mb-2">
             <img src={Logo} alt="Open sacco logo" className="w-32 h-32" />
             <h3 className="pb-3 text-lg">Welcome back!</h3>
